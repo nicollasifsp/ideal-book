@@ -1,0 +1,35 @@
+classes
+Usuario
+	nome, email, senha, tipoUsuario
+	grava informação no banco de dados
+
+ControllerUsuario
+	validarDados()
+	retornar 'ok' ou 'erro'
+
+Livro
+	titulo, descrição,autor,imagem, quantPagina
+	gravar no banco de dados
+
+ControllerLivro
+	validarDados()
+	
+
+para não esquecer.
+
+
+tela cadastro
+	nome,email,senha,confirmarSenha,tipoUsuario(leitor ou escritor)
+
+tela login
+	email,senha
+
+em qualquer um dos casos vai para o controllerUsuario que vai retornar um 'ok' ou um 'erro'
+caso 'ok' vai para a tela inicial com a coleção de livro, se tipoUsuario==leitor. 
+
+Caso contrario vai para a tela inicial para cadastrar livro, vai ter um botão adicionar livro e vai aparecer, titulo, descrição, autor, genero, dataCriação, quantPagina, imagem(se consegurir).Seria legal tentar colocar essas informação no banco de dados
+
+Caso o controllerUsuario retornar 'erro' vai aparecer uma tela de erro. Posso tentar fazer a validação de idade, tipo caso idade <16. Erro por "falta" de idade
+
+todas essas informação do livro vão para o controllerLivro que ira ser validados e caso eu consiga posso tentar salvar as informação no banco de dados 
+
