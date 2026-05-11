@@ -24,3 +24,5 @@ class UsuarioModel():
 
     def salvarRegistros(self): #caso precise passe como paramêtro o objeto
         pass
+
+

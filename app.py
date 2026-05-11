@@ -1,5 +1,9 @@
 from flask import *
+from flask_sqlalchemy import *
 app=Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
+db=SQLAlchemy(app)
+db.init_app(app)
 
 @app.route("/")
 def home():
