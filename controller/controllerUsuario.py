@@ -20,8 +20,10 @@ class ControllerUsuario():
         if not usuarioExistente:
             return False
         else:
-            tipoUsuario= db.session.query(UsuarioModel.tipoUsuario).filter_by(email=email,senha=senha).first()
-            if tipoUsuario == "leitor":
+            resultado= db.session.query(UsuarioModel.tipoUsuario).filter_by(email=email,senha=senha).first()
+            tipoUsuario=resultado[0]
+            print(tipoUsuario)
+            if tipoUsuario == "leitor".lower():
                 return "leitor"
             else:
                 return "escritor"

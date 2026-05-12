@@ -15,7 +15,7 @@ controllerLivro=ControllerLivro()
 app=Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
 db.init_app(app)
-pasta="imagens"
+pasta="static"
 app.config['UPLOAD_FOLDER'] = pasta
 os.makedirs(pasta, exist_ok=True)
 
@@ -30,9 +30,7 @@ def renderLogin():
 @app.route("/renderCadastro")
 def renderCadastro():
     return render_template("cadastro.html")
-@app.route("/renderBiblioteca")
-def renderBiblioteca():
-    return render_template("biblioteca.html")
+
 @app.route("/cadastrarLivro")
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
@@ -47,13 +45,10 @@ def fazerLogin():
     if mensagemLogin==False:
         return render_template("login.html",erro="Usuário não encontrado, tente criar uma conta")
     else:
-        if mensagemLogin=="leitor":
-            return redirect(url_for("renderBiblioteca"))
+        if mensagemLogin.lower() == "leitor".lower():
+            return redirect(url_for("biblioteca"))
         else:
             return redirect(url_for("renderCadastrarLivro"))
-
-    
-
 
 @app.route('/Cadastro',methods=["POST"])
 def fazerCadastro():
@@ -81,8 +76,8 @@ def cadastrarLivro():
     quantPag=int(request.form["quantPag"])
     imagem=request.files["imagem"]
 
-    nomeImagem = secure_filename(imagem.filename)
-    caminhoImagem = os.path.join(app.config['UPLOAD_FOLDER'], nomeImagem)
+    imagemNome = secure_filename(imagem.filename)
+    caminhoImagem = pasta + "/" + imagemNome
     imagem.save(caminhoImagem)
 
     mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,conteudo,caminhoImagem,quantPag)
@@ -91,7 +86,10 @@ def cadastrarLivro():
     else:
         return render_template("cadastrarLivro.html",erro="infezmente occoreu um erro, tente novamante")
 
-    
+@app.route("/biblioteca")
+def biblioteca():
+    livros=controllerLivro.getLivros()
+    return render_template("biblioteca.html",livros=livros)
 
 if __name__=="__main__":
     with app.app_context():
