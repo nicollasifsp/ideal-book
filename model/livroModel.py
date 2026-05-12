@@ -1,35 +1,12 @@
-class LivroModel():
-    def __init__(self,titulo, descricao,autor,caminhoImagem, quantPag,conteudo):
-        self__titulo=titulo
-        self__descricao=descricao
-        self__autor=autor
-        self__caminhoImagem=caminhoImagem
-        self__quantPag=quantPag
-        self__conteudo=conteudo
+from db import db
 
-        def getTitulo(self):
-            return self__titulo
-        def setTitulo(self,novoTitulo):
-            self__titulo=novoTitulo
-        
-        def getDescricao(self):
-            return self__descricao
-        def setDescricao(self,novaDescricao):
-            self__descricao=novaDescricao
-        
-        def getAutor(self):
-            return self__autor
-        def setAutor(self,novoAutor):
-            self__autor=novoAutor
-
-        def getQuantPag(self):
-            return self__quantPag
-        def setQuantPAg(self,novaQuantPag):
-            self__quantPag=novaQuantPag
-
-        def getConteudo(self):
-            return self__conteudo
-        def setConteudo(self,novoConteudo):
-            self__conteudo=novoConteudo
-        
-        
+class LivroModel(db.Model):
+    __tablename__="livros"
+    id=db.Column(db.Integer,primary_key=True)
+    titulo=db.Column(db.String,nullable=False)
+    autor=db.Column(db.String,nullable=False)
+    descricao=db.Column(db.String,nullable=False)
+    conteudo = db.Column(db.Text, nullable=False)
+    caminhaoImagem=db.Column(db.String,nullable=False,unique=True)
+    quantPag=db.Column(db.Integer,nullable=False)
+    

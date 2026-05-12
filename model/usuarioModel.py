@@ -1,28 +1,11 @@
-class UsuarioModel():
-    def __init__(self,nome,email,senha,tipoUsuario):
-        self__nome=nome
-        self__email=email
-        self__senha=senha
-        self__tipoUsuario=tipoUsuario
+from db import db
+
+class UsuarioModel(db.Model):
+
+    __tablename__="usuarios"
     
-    def getNome(self):
-        return self__nome
-    
-    def setNome(self,novoNome):
-        self__nome=novoNome
-
-    def getEmail(self):
-        return self__email
-    
-    def setEmail(self,novoEmail):
-        self__email=novoEmail
-
-    def getSenha(self):
-        return self__senha
-    def setSenha(self,novaSenha):
-        self__senha=novaSenha
-
-    def salvarRegistros(self): #caso precise passe como paramêtro o objeto
-        pass
-
-
+    id=db.Column(db.Integer,primary_key=True)
+    nome=db.Column(db.String(60),nullable=False)
+    senha=db.Column(db.String(20),nullable=False)
+    email=db.Column(db.String(60),nullable=False)
+    tipoUsuario=db.Column(db.String(20),nullable=False)
