@@ -7,9 +7,14 @@
 <body>
 
     <h1>Cadastrar Livro</h1>
-
+    {% if erro %}
+        <p>{{ erro }}</p>
+    {% endif %}
+    {% if sucesso %}
+        <p>{{ sucesso }}</p>
+    {% endif %}
     <form 
-        action="/CadastrarLivro" 
+        action="/cadastrarLivro" 
         method="POST" 
         enctype="multipart/form-data"
     >

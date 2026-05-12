@@ -7,6 +7,6 @@ class LivroModel(db.Model):
     autor=db.Column(db.String,nullable=False)
     descricao=db.Column(db.String,nullable=False)
     conteudo = db.Column(db.Text, nullable=False)
-    caminhaoImagem=db.Column(db.String,nullable=False,unique=True)
+    caminhoImagem=db.Column(db.String,nullable=False,unique=True)
     quantPag=db.Column(db.Integer,nullable=False)
     

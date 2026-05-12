@@ -4,6 +4,8 @@ from db import db
 from model.usuarioModel import UsuarioModel
 from controller.controllerUsuario import ControllerUsuario
 from controller.controllerLivro import ControllerLivro
+import os
+from werkzeug.utils import secure_filename
 
 
 controllerUsuario=ControllerUsuario()
@@ -13,6 +15,10 @@ controllerLivro=ControllerLivro()
 app=Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
 db.init_app(app)
+pasta="imagens"
+app.config['UPLOAD_FOLDER'] = pasta
+os.makedirs(pasta, exist_ok=True)
+
 #os renders
 @app.route("/")
 def home():
@@ -73,8 +79,17 @@ def cadastrarLivro():
     descricao=request.form["descricao"]
     conteudo=request.form["conteudo"]
     quantPag=int(request.form["quantPag"])
-    imagem=request.form["imagem"]
-    controllerLivro.salvarLivro(titulo,autor,descricao,conteudo,imagem,quantPag)
+    imagem=request.files["imagem"]
+
+    nomeImagem = secure_filename(imagem.filename)
+    caminhoImagem = os.path.join(app.config['UPLOAD_FOLDER'], nomeImagem)
+    imagem.save(caminhoImagem)
+
+    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,conteudo,caminhoImagem,quantPag)
+    if mensagem==True:
+        return render_template("cadastrarLivro.html",sucesso="Livro adicionado com sucesso.")
+    else:
+        return render_template("cadastrarLivro.html",erro="infezmente occoreu um erro, tente novamante")
 
     
 
