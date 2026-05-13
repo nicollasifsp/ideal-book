@@ -15,3 +15,6 @@ class ControllerLivro():
     def getLivros(self):
         livros=LivroModel.query.all()
         return livros
+    def getConteudo(self,id):
+        livro=LivroModel.query.filter_by(id=id).first()
+        return livro

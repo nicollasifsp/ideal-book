@@ -91,6 +91,12 @@ def biblioteca():
     livros=controllerLivro.getLivros()
     return render_template("biblioteca.html",livros=livros)
 
+@app.route("/lerLivro/<id>")
+def lerLivro(id):
+    idLivo=int(id)
+    livro=controllerLivro.getConteudo(id)
+    return render_template("lerLivro.html",livro=livro)
+
 if __name__=="__main__":
     with app.app_context():
         db.create_all()
