@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obras</title>
+    <title>Livros</title>
 
     <style>
 
@@ -97,46 +97,46 @@
             background-color:#444;
         }
 
+        .vazio{
+            text-align:center;
+            font-size:22px;
+            color:#666;
+            margin-top:40px;
+        }
+
     </style>
 
 </head>
 <body>
 
-    <h1>Obras</h1>
+    <h1>Livros</h1>
 
     <div class="pai">
 
-        {% if obras %}
+        {% if livros %}
 
-            {% for obra in obras %}
+            {% for livro in livros %}
 
                 <div class="filha">
 
                     <img 
-                        src="{{ obra.caminhoImagem }}" 
-                        alt="imagem da obra"
+                        src="{{ livro.caminhoImagem }}" 
+                        alt="imagem do livro"
                     >
 
                     <div class="conteudo">
 
                         <p class="titulo">
-                            {{ obra.titulo }}
+                            {{ livro.titulo }}
                         </p>
 
                         <p class="descricao">
-                            {{ obra.descricao }}
+                            {{ livro.descricao }}
                         </p>
 
                         <p class="autor">
-                            {{ obra.autor }}
+                            {{ livro.autor }}
                         </p>
-
-                        <a 
-                            class="botao"
-                            href="{{ url_for('lerObra', id=obra.id) }}"
-                        >
-                            Ver Obra
-                        </a>
 
                     </div>
 
@@ -146,7 +146,9 @@
 
         {% else %}
 
-            <p>Nenhuma obra cadastrada.</p>
+            <p class="vazio">
+                Nenhum livro cadastrado.
+            </p>
 
         {% endif %}
 

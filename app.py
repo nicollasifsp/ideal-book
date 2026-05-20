@@ -1,6 +1,6 @@
 from flask import *
 from flask_sqlalchemy import *
-from bd.db import db
+from database.db import db
 from model.usuarioModel import UsuarioModel
 from controller.controllerUsuario import ControllerUsuario
 from controller.controllerLivro import ControllerLivro
@@ -16,6 +16,7 @@ controllerLivro=ControllerLivro()
 app=Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+
 db.init_app(app)
 pasta="static"
 app.config['UPLOAD_FOLDER'] = pasta
@@ -37,9 +38,6 @@ def renderCadastro():
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
 
-@app.route("/renderObras")
-def renderObras():
-    return render_template("obras.html")
 
 
 
@@ -79,7 +77,7 @@ def cadastrarLivro():
     titulo=request.form["titulo"]
     autor=request.form["autor"]
     descricao=request.form["descricao"]
-    conteudo=request.form["conteudo"]
+    
     quantPag=int(request.form["quantPag"])
     imagem=request.files["imagem"]
 
@@ -88,7 +86,7 @@ def cadastrarLivro():
     imagem.save(caminhoImagem)
     idUsuario=session.get("user_id")
 
-    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,conteudo,caminhoImagem,quantPag,idUsuario)
+    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,quantPag,idUsuario)
     if mensagem==True:
         return render_template("cadastrarLivro.html",sucesso="Livro adicionado com sucesso.")
     else:
@@ -109,7 +107,9 @@ def lerLivro(id):
 def obras():
     idUsuario=session.get("user_id")
     livros=controllerLivro.getLivroAutor(idUsuario)
-    return render_template("obras.html",livros)
+    controllerLivro.mostrarDados(livros)
+    return render_template("obras.html",livros=livros)
+
 if __name__=="__main__":
     with app.app_context():
         db.create_all()
