@@ -1,5 +1,5 @@
 from model.usuarioModel import UsuarioModel
-from db import db
+from bd.db import db
 class ControllerUsuario():
     def __init__(self):
         pass
@@ -20,10 +20,11 @@ class ControllerUsuario():
         if not usuarioExistente:
             return False
         else:
-            resultado= db.session.query(UsuarioModel.tipoUsuario).filter_by(email=email,senha=senha).first()
-            tipoUsuario=resultado[0]
-            print(tipoUsuario)
-            if tipoUsuario == "leitor".lower():
-                return "leitor"
-            else:
-                return "escritor"
+            resultado= UsuarioModel.query.filter_by(email=email,senha=senha).first()
+            return resultado    
+    
+    def getUserId(id):
+        usuario=UsuarioModel.query.filter_by(id=id).first()
+        return usuario
+
+        

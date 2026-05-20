@@ -26,8 +26,12 @@
             <label for="confirmarSenha">Confirmar Senha:</label>
             <input type="text" name="confirmarSenha" required>
 
-            <label for="tipoUsuario">Tipo usuário:</label>
-            <input type="text" name="tipoUsuario" required>
+            <label for="tipoUsuario">Tipo de usuário:</label>
+
+            <select name="tipoUsuario" id="tipo">
+                <option value="leitor">Leitor</option>
+                <option value="escritor">Escritor</option>
+            </select>
 
             <button type="submit">Enviar</button>
     </form>

@@ -1,4 +1,4 @@
-from db import db
+from bd.db import db
 
 class LivroModel(db.Model):
     __tablename__="livros"
@@ -9,4 +9,11 @@ class LivroModel(db.Model):
     conteudo = db.Column(db.Text, nullable=False)
     caminhoImagem=db.Column(db.String,nullable=False,unique=True)
     quantPag=db.Column(db.Integer,nullable=False)
+    idUsuario = db.Column(
+        db.Integer,
+        db.ForeignKey("usuarios.id"),
+        nullable=False
+    )
+  
+    
     

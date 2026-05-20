@@ -1,11 +1,11 @@
 from model.livroModel import LivroModel
-from db import db
+from bd.db import db
 class ControllerLivro():
     def __init__(self):
         pass
-    def salvarLivro(self,titulo,autor,descricao,conteudo,caminhoImagem,quantPag):
+    def salvarLivro(self,titulo,autor,descricao,conteudo,caminhoImagem,quantPag,idUsuario):
         try:
-            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,conteudo=conteudo,caminhoImagem=caminhoImagem,quantPag=quantPag)
+            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,conteudo=conteudo,caminhoImagem=caminhoImagem,quantPag=quantPag,idUsuario=idUsuario)
             db.session.add(novoLivro)
             db.session.commit()
             return True
@@ -15,6 +15,11 @@ class ControllerLivro():
     def getLivros(self):
         livros=LivroModel.query.all()
         return livros
+    
     def getConteudo(self,id):
         livro=LivroModel.query.filter_by(id=id).first()
         return livro
+    
+    def getLivroAutor(idUsuario):
+        livros=LivroModel.query.filter_by(idUsuario=idUsuario)
+        return livros

@@ -32,3 +32,6 @@ Caso contrario vai para a tela inicial para cadastrar livro, vai ter um botão a
 Caso o controllerUsuario retornar 'erro' vai aparecer uma tela de erro. Posso tentar fazer a validação de idade, tipo caso idade <16. Erro por "falta" de idade
 
 todas essas informação do livro vão para o controllerLivro que ira ser validados e caso eu consiga posso tentar salvar as informação no banco de dados 
+
+FALTA FAZER: 
+uma página que contenha todos os livros do autor, nessa página o autor pode editar capitulo

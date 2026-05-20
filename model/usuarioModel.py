@@ -1,4 +1,4 @@
-from db import db
+from bd.db import db
 
 class UsuarioModel(db.Model):
 

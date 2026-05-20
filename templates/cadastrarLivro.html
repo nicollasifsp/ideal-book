@@ -64,11 +64,11 @@
 
         <br><br>
 
-        <label>Imagem:</label>
+        <label>Capa do livro:</label>
         <input 
             type="file" 
             name="imagem"
-            accept="image/*"
+            accept=".png, .jpg, .jpeg"
             required
         >
 
@@ -79,6 +79,7 @@
         </button>
 
     </form>
+    <a href="{{url_for('renderObras')}}">Suas obras</a>
 
 </body>
 </html>
