@@ -1,5 +1,5 @@
 from model.usuarioModel import UsuarioModel
-from bd.db import db
+from database.db import db
 class ControllerUsuario():
     def __init__(self):
         pass

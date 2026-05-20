@@ -1,5 +1,5 @@
 from model.livroModel import LivroModel
-from bd.db import db
+from database.db import db
 class ControllerLivro():
     def __init__(self):
         pass
