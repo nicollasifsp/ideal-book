@@ -16,13 +16,14 @@ class ControllerLivro():
         livros=LivroModel.query.all()
         return livros
     
-    def getConteudo(self,id):
-        livro=LivroModel.query.filter_by(id=id).first()
-        return livro
     
-    def getLivroAutor(self,idUsuario):
-        livros=LivroModel.query.filter_by(idUsuario=idUsuario)
+    def getLivrosAutor(self,idUsuario):
+        livros=LivroModel.query.filter_by(idUsuario=idUsuario).all()
         return livros
+    
+    def getLivroIdLivro(self,idLivro):
+        livro=LivroModel.query.filter_by(id=idLivro).first()
+        return livro
     
     def mostrarDados(self,livros):
         for livro in livros:

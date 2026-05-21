@@ -4,6 +4,7 @@ from database.db import db
 from model.usuarioModel import UsuarioModel
 from controller.controllerUsuario import ControllerUsuario
 from controller.controllerLivro import ControllerLivro
+from controller.controllerCapitulo import ControllerCapitulo
 import os
 from werkzeug.utils import secure_filename
 from dotenv import *
@@ -11,6 +12,7 @@ from dotenv import *
 
 controllerUsuario=ControllerUsuario()
 controllerLivro=ControllerLivro()
+controllerCapitulo=ControllerCapitulo()
 
 
 app=Flask(__name__)
@@ -106,9 +108,23 @@ def lerLivro(id):
 @app.route("/obras")
 def obras():
     idUsuario=session.get("user_id")
-    livros=controllerLivro.getLivroAutor(idUsuario)
-    controllerLivro.mostrarDados(livros)
+    livros=controllerLivro.getLivrosAutor(idUsuario)
+    
     return render_template("obras.html",livros=livros)
+
+@app.route("/obras/<int:idLivro>")
+def menuLivro(idLivro):
+    livro=controllerLivro.getLivroIdLivro(idLivro)
+    idSession=session.get("user_id")
+    if not livro:
+        abort(404)
+        return
+    if livro.idUsuario==idSession:
+        capitulos=controllerCapitulo.getCapitulos(livro.id)
+        return render_template("menuLivro.html",capitulos=capitulos)
+    else:
+        abort(403)
+        return
 
 if __name__=="__main__":
     with app.app_context():
