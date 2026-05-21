@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ capitulo.titulo }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .conteudo {
+            white-space: pre-line;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .voltar {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        .voltar:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>{{ capitulo.titulo }}</h1>
+
+    <div class="conteudo">
+        {{ capitulo.conteudo }}
+    </div>
+    
+
+</div>
+
+</body>
+</html>

@@ -101,9 +101,17 @@ def biblioteca():
 
 @app.route("/lerLivro/<id>")
 def lerLivro(id):
-    idLivo=int(id)
-    livro=controllerLivro.getConteudo(id)
-    return render_template("lerLivro.html",livro=livro)
+    idLivro=int(id)
+    livro=controllerLivro.getLivroIdLivro(idLivro)
+    capitulos=controllerCapitulo.getTodosCapitulos(idLivro)
+    return render_template("lerLivro.html",capitulos=capitulos,livro=livro)
+
+@app.route("/lerCapitulo/<int:idCapitulo>")
+def lerCapitulo(idCapitulo):
+    capitulo=controllerCapitulo.getCapitulo(idCapitulo)
+    return render_template("lerCapitulo.html",capitulo=capitulo)
+
+    
 
 @app.route("/obras")
 def obras():

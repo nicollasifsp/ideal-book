@@ -10,11 +10,11 @@ class ControllerCapitulo():
 
     def getCapitulo(self, idLivro):
 
-        capitulos = CapituloModel.query.filter_by(
+        capitulo = CapituloModel.query.filter_by(
             idLivro=idLivro
         ).first()
 
-        return capitulos
+        return capitulo
 
 
     def getConteudo(self, idCapitulo):
@@ -89,3 +89,7 @@ class ControllerCapitulo():
             db.session.rollback()
 
             return False
+    
+    def getTodosCapitulos(self, idLivro):
+        capitulos=CapituloModel.query.filter_by(idLivro=idLivro).all()
+        return capitulos

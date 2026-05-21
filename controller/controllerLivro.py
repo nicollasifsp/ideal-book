@@ -12,6 +12,7 @@ class ControllerLivro():
         except Exception as erro:
             print(erro)
             return False
+        
     def getLivros(self):
         livros=LivroModel.query.all()
         return livros
