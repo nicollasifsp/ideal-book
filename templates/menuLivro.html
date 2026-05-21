@@ -26,9 +26,16 @@
 
         h1{
             text-align:center;
-            margin-bottom:40px;
+            margin-bottom:15px;
             color:#222;
             font-size:42px;
+        }
+
+        .nomeLivro{
+            text-align:center;
+            font-size:24px;
+            color:#555;
+            margin-bottom:40px;
         }
 
         .topo{
@@ -102,13 +109,25 @@
 
     <div class="container">
 
-        <h1>Capítulos</h1>
+        <h1>
+            Capítulos
+        </h1>
+
+        <p class="nomeLivro">
+            {{ livro.titulo }}
+        </p>
 
         <div class="topo">
 
             <a 
                 class="botaoAdicionar"
-                href=""
+
+                href="{{ url_for(
+                    'capitulos',
+                    acao='criar',
+                    idLivro=livro.id,
+                    idCapitulo=0
+                ) }}"
             >
                 + Adicionar Capítulo
             </a>
@@ -129,17 +148,16 @@
 
                         <a 
                             class="botao"
-                            href=""
+
+                            href="{{ url_for(
+                                'capitulos',
+                                acao='editar',
+                                idLivro=livro.id,
+                                idCapitulo=capitulo.id
+                            ) }}"
                         >
                             Editar
-                        </a> 
-
-                        <a 
-                            class="botao"
-                            href=""
-                        >
-                            Ler
-                        </a> 
+                        </a>
 
                     </div>
 
