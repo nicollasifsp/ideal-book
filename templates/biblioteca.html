@@ -55,6 +55,7 @@
             text-align: center;
         }
 
+        /* 🔥 DESCRIÇÃO LIMITADA */
         .descricao{
             margin-top: 12px;
             font-size: 15px;
@@ -62,6 +63,32 @@
             text-align: justify;
             line-height: 1.6;
             padding: 0 15px;
+
+            max-height: 70px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .descricao.expandida{
+            max-height: 1000px;
+        }
+
+        .btn-desc{
+            display: none;
+            margin: 10px auto 0;
+
+            background: none;
+            border: none;
+
+            color: #7c3aed;
+            font-size: 13px;
+
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-desc:hover{
+            text-decoration: underline;
         }
 
         .autor{
@@ -75,8 +102,8 @@
         a{
             display: block;
             margin: 18px;
-            text-align: center;
 
+            text-align: center;
             text-decoration: none;
 
             background: #7c3aed;
@@ -114,9 +141,14 @@
                         {{ livro.titulo }}
                     </p>
 
-                    <p class="descricao">
+                    <p class="descricao" id="desc-{{ livro.id }}">
                         {{ livro.descricao }}
                     </p>
+
+                    <button class="btn-desc" id="btn-{{ livro.id }}"
+                            onclick="toggleDesc('{{ livro.id }}')">
+                        Mostrar mais
+                    </button>
 
                     <p class="autor">
                         {{ livro.autor }}
@@ -133,6 +165,33 @@
         {% endif %}
 
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const descricoes = document.querySelectorAll(".descricao");
+
+            descricoes.forEach(desc => {
+                const btn = desc.nextElementSibling;
+
+                if (desc.scrollHeight > desc.clientHeight) {
+                    btn.style.display = "block";
+                }
+            });
+        });
+
+        function toggleDesc(id){
+            const desc = document.getElementById("desc-" + id);
+            const btn = document.getElementById("btn-" + id);
+
+            desc.classList.toggle("expandida");
+
+            if(desc.classList.contains("expandida")){
+                btn.innerText = "Mostrar menos";
+            } else {
+                btn.innerText = "Mostrar mais";
+            }
+        }
+    </script>
 
 </body>
 </html>
