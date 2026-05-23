@@ -1,13 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagína inicial</title>
+    <title>Página inicial</title>
+
+    <style>
+
+        body{
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #e3e3e3, #f7f7f7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container{
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .botoes{
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        a{
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .login{
+            background: #007bff;
+            color: white;
+        }
+
+        .login:hover{
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .cadastro{
+            background: #28a745;
+            color: white;
+        }
+
+        .cadastro:hover{
+            background: #1e7e34;
+            transform: scale(1.05);
+        }
+
+    </style>
+
 </head>
 <body>
-    <a href="{{url_for('renderLogin')}}">login</a>
-    <a href="{{url_for('renderCadastro')}}">novo usuário</a>
+
+    <div class="container">
+
+        <h1>Bem-vindo</h1>
+
+        <div class="botoes">
+
+            <a class="login" href="{{ url_for('renderLogin') }}">
+                Login
+            </a>
+
+            <a class="cadastro" href="{{ url_for('renderCadastro') }}">
+                Novo usuário
+            </a>
+
+        </div>
+
+    </div>
 
 </body>
 </html>

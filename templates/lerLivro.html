@@ -8,37 +8,80 @@
 
         body{
             font-family: Arial, Helvetica, sans-serif;
-            margin:40px;
-            background-color:#f4f4f4;
+            margin:0;
+            background:#f2f2f2;
         }
 
         .container{
-            background:white;
-            padding:30px;
-            border-radius:10px;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        img{
-            width:300px;
-            border-radius:10px;
+        h1{
+            font-size: 36px;
+            margin-bottom: 25px;
+            color: #222;
         }
 
-        .titulo{
-            font-size:40px;
-            font-weight:bold;
-            margin-top:20px;
+        .capitulo{
+            background: #f9f9f9;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
         }
 
-        .autor{
-            font-size:22px;
-            margin-top:10px;
+        .capitulo:hover{
+            background: #efefef;
+            transform: scale(1.01);
         }
 
-        .conteudo{
-            margin-top:30px;
-            font-size:20px;
-            line-height:1.8;
-            white-space:pre-wrap;
+        .capitulo h2{
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .capitulo a{
+            text-decoration: none;
+            background: #333;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .capitulo a:hover{
+            background: #555;
+        }
+
+        /* BOTÃO VOLTAR */
+        .voltar{
+            display: inline-block;
+            margin: 20px auto 40px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .voltar:hover{
+            background: #0056b3;
+        }
+
+        .topo{
+            max-width: 900px;
+            margin: auto;
+            text-align: left;
         }
 
     </style>
@@ -47,12 +90,23 @@
 <body>
 
     <div class="container">
-        <h1>{{livro.titulo}}</h1>
+
+        <h1>{{ livro.titulo }}</h1>
+
         {% for capitulo in capitulos %}
-            <h2>{{capitulo.titulo}}</h2>
-            <a href="{{ url_for('lerCapitulo', idCapitulo=capitulo.id) }}">Ler</a>
-        {% endfor %} 
-        
+            <div class="capitulo">
+                <h2>{{ capitulo.titulo }}</h2>
+
+                <a href="{{ url_for('lerCapitulo', idCapitulo=capitulo.idCapitulo) }}">
+                    Ler
+                </a>
+            </div>
+        {% endfor %}
+
+        <a class="voltar" href="{{ url_for('biblioteca') }}">
+            ← Voltar para a biblioteca
+        </a>
+
     </div>
 
 </body>

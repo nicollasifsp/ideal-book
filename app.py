@@ -104,7 +104,7 @@ def biblioteca():
 def lerLivro(id):
     idLivro=int(id)
     livro=controllerLivro.getLivroIdLivro(idLivro)
-    capitulos=controllerCapitulo.getTodosCapitulos(idLivro)
+    capitulos=controllerCapitulo.getCapitulos(idLivro)
     return render_template("lerLivro.html",capitulos=capitulos,livro=livro)
 
 @app.route("/lerCapitulo/<int:idCapitulo>")
