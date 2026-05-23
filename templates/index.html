@@ -7,63 +7,74 @@
 
     <style>
 
-        body{
+        *{
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body{
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #e3e3e3, #f7f7f7);
+            background: whitesmoke;
+            height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
 
         .container{
             text-align: center;
-            background: white;
-            padding: 50px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px;
         }
 
         h1{
+            color: black;
+            font-size: 40px;
             margin-bottom: 30px;
-            font-size: 28px;
-            color: #333;
+            font-weight: 600;
         }
 
         .botoes{
             display: flex;
-            gap: 20px;
+            gap: 14px;
             justify-content: center;
         }
 
         a{
             text-decoration: none;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: 0.2s;
+            padding: 12px 22px;
+
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+
+            transition: 0.2s ease;
         }
 
+        /* botão principal */
         .login{
-            background: #007bff;
+            background: #8b5cf6;
             color: white;
+            border: 1px solid transparent;
         }
 
         .login:hover{
-            background: #0056b3;
-            transform: scale(1.05);
+            background: #7c3aed;
+            transform: translateY(-1px);
         }
 
+        /* botão secundário */
         .cadastro{
-            background: #28a745;
-            color: white;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #d4d4d8;
         }
 
         .cadastro:hover{
-            background: #1e7e34;
-            transform: scale(1.05);
+            border-color: #8b5cf6;
+            color: #f4f4f5;
+            transform: translateY(-1px);
         }
 
     </style>

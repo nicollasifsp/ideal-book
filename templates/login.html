@@ -6,80 +6,108 @@
     <title>Login</title>
 
     <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body{
-            margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #e6e6e6, #f5f5f5);
+            background: #f4f4f5;
+            height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
 
         .container{
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 350px;
+            width: 340px;
         }
 
         h1{
+            color: #111;
             text-align: center;
-            margin-bottom: 25px;
-            color: #333;
+            margin-bottom: 30px;
+            font-size: 34px;
+            font-weight: 600;
         }
 
         label{
-            font-weight: bold;
+            color: #333;
             font-size: 14px;
+            display: block;
+            margin-bottom: 6px;
         }
 
         input{
             width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            padding: 14px;
+            margin-bottom: 18px;
+
+            border: 1px solid #d4d4d4;
             border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
+
+            background: #ffffff;
+            color: #111;
+
+            font-size: 15px;
+
+            transition: 0.2s;
+        }
+
+        input:focus{
+            outline: none;
+            border-color: #7c3aed;
         }
 
         button{
             width: 100%;
-            padding: 12px;
-            background: #007bff;
-            color: white;
+            padding: 14px;
+
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+
+            background: #7c3aed;
+            color: white;
+
+            font-size: 15px;
+            font-weight: bold;
+
             cursor: pointer;
             transition: 0.2s;
         }
 
         button:hover{
-            background: #0056b3;
+            background: #6d28d9;
         }
 
         .erro{
             background: #fdecea;
+            border: 1px solid #dc3545;
+
             color: #b71c1c;
-            padding: 10px;
+
+            padding: 12px;
+            margin-bottom: 18px;
+
             border-radius: 8px;
-            margin-bottom: 15px;
+
             font-size: 14px;
-            border-left: 5px solid #dc3545;
         }
 
         .voltar{
             display: block;
             text-align: center;
-            margin-top: 15px;
-            text-decoration: none;
+
+            margin-top: 18px;
+
             color: #555;
+            text-decoration: none;
             font-size: 14px;
+
+            transition: 0.2s;
         }
 
         .voltar:hover{
@@ -103,10 +131,10 @@
 
     <form action="/Login" method="post">
 
-        <label>Email:</label>
+        <label>Email</label>
         <input type="text" name="email" required>
 
-        <label>Senha:</label>
+        <label>Senha</label>
         <input type="password" name="senha" required>
 
         <button type="submit">Entrar</button>

@@ -7,51 +7,92 @@
 
     <style>
 
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body{
             font-family: Arial, Helvetica, sans-serif;
-            background-color: #f4f4f4;
+            background: #f4f4f5;
+            padding: 40px;
+            color: #111;
         }
 
         .pai{
-            display:flex;
-            flex-wrap:wrap;
-            gap:30px;
-            justify-content:center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
         }
 
         .filha{
-            width:350px;
-            background-color:white;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0px 0px 10px rgba(0,0,0,0.2);
+            width: 320px;
+            background: white;
+
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+
+            overflow: hidden;
+            transition: 0.2s;
+        }
+
+        .filha:hover{
+            border-color: #7c3aed;
         }
 
         .filha img{
-            width:100%;
-            height:500px;
-            object-fit:cover;
-            border-radius:10px;
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
         }
 
         .titulo{
-            font-size:32px;
-            font-weight:bold;
-            margin-top:15px;
-            text-align:center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
         }
 
         .descricao{
-            margin-top:15px;
-            font-size:18px;
-            text-align:justify;
+            margin-top: 12px;
+            font-size: 15px;
+            color: #555;
+            text-align: justify;
+            line-height: 1.6;
+            padding: 0 15px;
         }
 
         .autor{
-            margin-top:20px;
-            text-align:center;
-            font-size:20px;
-            font-weight:bold;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        a{
+            display: block;
+            margin: 18px;
+            text-align: center;
+
+            text-decoration: none;
+
+            background: #7c3aed;
+            color: white;
+
+            padding: 12px;
+            border-radius: 8px;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        a:hover{
+            background: #6d28d9;
         }
 
     </style>
@@ -67,10 +108,7 @@
 
                 <div class="filha">
 
-                    <img 
-                        src="{{ livro.caminhoImagem }}" 
-                        alt="capa do livro"
-                    >
+                    <img src="{{ livro.caminhoImagem }}" alt="capa do livro">
 
                     <p class="titulo">
                         {{ livro.titulo }}
@@ -83,7 +121,10 @@
                     <p class="autor">
                         {{ livro.autor }}
                     </p>
-                    <a href="{{ url_for('lerLivro', id=livro.id) }}">ler livro</a>
+
+                    <a href="{{ url_for('lerLivro', id=livro.id) }}">
+                        Ler livro
+                    </a>
 
                 </div>
 
