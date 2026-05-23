@@ -20,84 +20,59 @@
         }
 
         body{
-            background-color:#f4f4f4;
-            font-family:Arial, Helvetica, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            background:#f4f4f4;
             padding:40px;
         }
 
         .container{
             max-width:900px;
             margin:auto;
-            background-color:white;
+            background:white;
             padding:40px;
-            border-radius:20px;
-            box-shadow:0px 0px 15px rgba(0,0,0,0.1);
+            border-radius:15px;
+            box-shadow:0 0 15px rgba(0,0,0,0.1);
         }
 
         h1{
             text-align:center;
             margin-bottom:25px;
+            font-size:36px;
             color:#222;
-            font-size:38px;
-        }
-
-        .mensagem{
-            background-color:#d4edda;
-            color:#155724;
-            padding:15px;
-            border-radius:10px;
-            margin-bottom:20px;
-            text-align:center;
-        }
-
-        .erro{
-            background-color:#f8d7da;
-            color:#721c24;
-            padding:15px;
-            border-radius:10px;
-            margin-bottom:20px;
-            text-align:center;
         }
 
         .campo{
-            margin-bottom:25px;
+            margin-bottom:20px;
         }
 
         label{
             display:block;
-            margin-bottom:10px;
-            font-size:18px;
+            margin-bottom:8px;
             font-weight:bold;
             color:#333;
         }
 
-        input{
+        input, textarea{
             width:100%;
-            padding:15px;
+            padding:14px;
             border:none;
             border-radius:10px;
-            background-color:#eee;
+            background:#eee;
             font-size:16px;
         }
 
         textarea{
-            width:100%;
-            height:500px;
-            resize:none;
-            border:none;
-            border-radius:10px;
-            background-color:#eee;
-            padding:20px;
-            font-size:17px;
+            height:400px;
+            resize:vertical;
             line-height:1.6;
         }
 
         button{
             width:100%;
-            padding:16px;
+            padding:15px;
             border:none;
             border-radius:10px;
-            background-color:#222;
+            background:#222;
             color:white;
             font-size:18px;
             cursor:pointer;
@@ -105,7 +80,33 @@
         }
 
         button:hover{
-            background-color:#444;
+            background:#444;
+        }
+
+        .mensagem{
+            background:#d4edda;
+            color:#155724;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+            text-align:center;
+        }
+
+        .erro{
+            background:#f8d7da;
+            color:#721c24;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+            text-align:center;
+        }
+
+        .voltar{
+            display:block;
+            margin-top:20px;
+            text-align:center;
+            text-decoration:none;
+            color:#333;
         }
 
     </style>
@@ -113,63 +114,56 @@
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>
+    <h1>
+        {% if capitulo %}
+            Editar Capítulo
+        {% else %}
+            Criar Capítulo
+        {% endif %}
+    </h1>
+
+    {% if sucesso %}
+        <p class="mensagem">{{ sucesso }}</p>
+    {% endif %}
+
+    {% if erro %}
+        <p class="erro">{{ erro }}</p>
+    {% endif %}
+
+    <form method="POST" autocomplete="off"
+          action="{{ url_for('addCapitulo', idLivro=livro.id) }}">
+
+        <div class="campo">
+            <label>Título</label>
+            <input type="text" name="titulo"
+                   value="{{ capitulo.titulo if capitulo else '' }}"
+                   required>
+        </div>
+
+        <div class="campo">
+            <label>Conteúdo</label>
+            <textarea name="conteudo" required>
+{{ capitulo.conteudo if capitulo else '' }}</textarea>
+        </div>
+
+        <button type="submit">
             {% if capitulo %}
-                Editar Capítulo
+                Salvar Alterações
             {% else %}
-                Novo Capítulo
+                Criar Capítulo
             {% endif %}
-        </h1>
+        </button>
 
-        {% if mensagem %}
-            <p class="mensagem">{{ mensagem }}</p>
-        {% endif %}
+    </form>
 
-        {% if erro %}
-            <p class="erro">{{ erro }}</p>
-        {% endif %}
+    <a class="voltar"
+       href="{{ url_for('menuLivro', idLivro=livro.id) }}">
+        Voltar para a obra
+    </a>
 
-        <form method="POST" autocomplete="off">
-
-            <div class="campo">
-
-                <label>Título</label>
-
-                <input 
-                    type="text"
-                    name="titulo"
-                    required
-                    {% if capitulo %}
-                        value="{{ capitulo.titulo }}"
-                    {% endif %}
-                >
-
-            </div>
-
-            <div class="campo">
-
-                <label>Conteúdo</label>
-
-                <textarea 
-                    name="conteudo"
-                    required
-                >{% if capitulo %}{{ capitulo.conteudo }}{% endif %}</textarea>
-
-            </div>
-
-            <button>
-                {% if capitulo %}
-                    Salvar Alterações
-                {% else %}
-                    Criar Capítulo
-                {% endif %}
-            </button>
-
-        </form>
-
-    </div>
+</div>
 
 </body>
 </html>

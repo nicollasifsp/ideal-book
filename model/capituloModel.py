@@ -3,7 +3,7 @@ class CapituloModel(db.Model):
 
     __tablename__ = "capitulos"
 
-    id = db.Column(db.Integer, primary_key=True)
+    idCapitulo = db.Column(db.Integer, primary_key=True)
 
     titulo = db.Column(db.String(150), nullable=False)
 

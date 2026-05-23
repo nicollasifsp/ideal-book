@@ -8,88 +8,43 @@ class ControllerCapitulo():
         pass
 
 
-    def getCapitulo(self, idLivro):
+    def getCapitulos(self, idLivro):
 
-        capitulo = CapituloModel.query.filter_by(
+        capitulos = CapituloModel.query.filter_by(
             idLivro=idLivro
-        ).first()
+        ).all()
 
-        return capitulo
-
-
-    def getConteudo(self, idCapitulo):
-
-        capitulo = CapituloModel.query.filter_by(
-            id=idCapitulo
-        ).first()
-
-        return capitulo
+        return capitulos
 
 
-    def criarCapitulo(
-        self,
-        titulo,
-        conteudo,
-        idLivro
-    ):
-
+    def salvarCapitulo(self,titulo,conteudo,idLivro):
         try:
-
-            novoCapitulo = CapituloModel(
-
-                titulo=titulo,
-
-                conteudo=conteudo,
-
-                idLivro=idLivro
-
-            )
-
-            db.session.add(
-                novoCapitulo
-            )
-
+            novoCapitulo=CapituloModel(titulo=titulo,conteudo=conteudo,idLivro=idLivro)
+            db.session.add(novoCapitulo)
             db.session.commit()
-
             return True
-
-        except:
-
-            db.session.rollback()
-
+        except Exception as erro:
+            print(f"ocorreu esse erro:\n{erro}")
             return False
-
-
-    def editarCapitulo(
-        self,
-        idCapitulo,
-        titulo,
-        conteudo
-    ):
-
+    
+    def getCapitulo(self,idCapitulo):
+        capitulo=CapituloModel.query.filter_by(idCapitulo=idCapitulo).first()
+        return capitulo
+    
+    def updateCapitulo(self, idCapitulo, titulo, conteudo):
         try:
-
-            capitulo = CapituloModel.query.get(
-                idCapitulo
-            )
+            capitulo = CapituloModel.query.filter_by(idCapitulo=idCapitulo).first()
 
             if not capitulo:
                 return False
 
             capitulo.titulo = titulo
-
             capitulo.conteudo = conteudo
 
             db.session.commit()
-
             return True
 
-        except:
-
-            db.session.rollback()
-
+        except Exception as erro:
+            print(f"ocorreu esse erro:\n{erro}")
             return False
     
-    def getTodosCapitulos(self, idLivro):
-        capitulos=CapituloModel.query.filter_by(idLivro=idLivro).all()
-        return capitulos

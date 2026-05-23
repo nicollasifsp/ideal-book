@@ -43,6 +43,7 @@ def renderCadastrarLivro():
 
 
 
+
 @app.route("/Login",methods=["POST"])
 def fazerLogin():
     email=request.form["email"]
@@ -128,119 +129,42 @@ def menuLivro(idLivro):
         abort(404)
         return
     if livro.idUsuario==idSession:
-        capitulos=controllerCapitulo.getCapitulo(livro.id)
+        capitulos=controllerCapitulo.getCapitulos(livro.id)
         return render_template("menuLivro.html",capitulos=capitulos,livro=livro)
     else:
         abort(403)
         return
 
-@app.route(
-    "/livro/<int:idLivro>/capitulo/<acao>/<int:idCapitulo>",
-    methods=["GET", "POST"]
-)
-def capitulos(acao, idLivro, idCapitulo):
-
-    idSession = session.get("user_id")
-
-    livro = controllerLivro.getLivroIdLivro(
-        idLivro
-    )
-    print(f"esse é o livro.idUsuario: {livro.idUsuario}")
-
-    if not livro:
-        abort(404)
-
-    if livro.idUsuario != idSession:
-        abort(403)
-
-    capitulo = None
-
-
-    if acao == "editar":
-
-        capitulo = controllerCapitulo.getCapitulo(
-            idCapitulo
-        )
-        print(f"esse é o capitulo.idLivro: {capitulo.idLivro}")
-
-        if not capitulo:
-            abort(404)
-
-        if capitulo.idLivro != idLivro:
-            abort(403)
-
-        
-        if request.method == "GET":
-
-            return render_template(
-                "addCapitulo.html",
-                capitulo=capitulo,
-                acao="editar"
-            )
-
-        
-        elif request.method == "POST":
-
-            titulo = request.form.get(
-                "titulo"
-            )
-
-            conteudo = request.form.get(
-                "conteudo"
-            )
-
-            mensagem = controllerCapitulo.editarCapitulo(
-                idCapitulo,
-                titulo,
-                conteudo
-            )
-
-            return render_template(
-                "addCapitulo.html",
-                capitulo=capitulo,
-                mensagem=mensagem,
-                acao="editar"
-            )
-
-
-
-    elif acao == "criar":
-
-        
-        if request.method == "GET":
-
-            return render_template(
-                "addCapitulo.html",
-                acao="criar"
-            )
-
-        
-        elif request.method == "POST":
-
-            titulo = request.form.get(
-                "titulo"
-            )
-
-            conteudo = request.form.get(
-                "conteudo"
-            )
-
-            mensagem = controllerCapitulo.criarCapitulo(
-                titulo,
-                conteudo,
-                idLivro
-            )
-
-            return render_template(
-                "addCapitulo.html",
-                mensagem=mensagem,
-                acao="criar"
-            )
-
+@app.route("/obras/adicionar/<int:idLivro>",methods=["POST","GET"])
+def addCapitulo(idLivro):
+    livro=controllerLivro.getLivroIdLivro(idLivro)
+    if request.method=="GET":
+        return render_template("addCapitulo.html", livro=livro)
     else:
+        titulo=request.form["titulo"]
+        conteudo=request.form["conteudo"]
+        mensagem=controllerCapitulo.salvarCapitulo(titulo,conteudo,idLivro)
+        
+        if mensagem==True:
+            return render_template("addCapitulo.html",sucesso="Capítulo addiconado com sucesso.",livro=livro)
+        else:
+            return render_template("addCapitulo.html",erro="infelizmente occoreu um erro, tente novamente mais tarde.",livro=livro)
 
-        abort(404)
+@app.route("/obras/editar/<int:idCapitulo>",methods=["GET","POST"])
+
+def editarCapitulo(idCapitulo):
     
+    capitulo=controllerCapitulo.getCapitulo(idCapitulo)
+    if request.method=="GET":
+        return render_template("editarCapitulo.html",capitulo=capitulo)
+    else:
+        titulo=request.form["titulo"]
+        conteudo=request.form["conteudo"]
+        mensagem=controllerCapitulo.updateCapitulo(idCapitulo,titulo,conteudo)
+        if mensagem==True:
+            return render_template("editarCapitulo.html",sucesso="Capítulo atualizado com sucesso",capitulo=capitulo)
+        else:
+             return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
 
 
 

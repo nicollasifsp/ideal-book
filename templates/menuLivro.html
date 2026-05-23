@@ -14,7 +14,7 @@
         }
 
         body{
-            font-family:Arial, Helvetica, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background-color:#f4f4f4;
             padding:40px;
         }
@@ -26,14 +26,14 @@
 
         h1{
             text-align:center;
-            margin-bottom:15px;
-            color:#222;
             font-size:42px;
+            margin-bottom:10px;
+            color:#222;
         }
 
-        .nomeLivro{
+        .livro{
             text-align:center;
-            font-size:24px;
+            font-size:22px;
             color:#555;
             margin-bottom:40px;
         }
@@ -41,29 +41,28 @@
         .topo{
             display:flex;
             justify-content:flex-end;
-            margin-bottom:30px;
+            margin-bottom:25px;
         }
 
-        .botaoAdicionar{
+        .btn-add{
             text-decoration:none;
-            background-color:#222;
-            color:white;
-            padding:14px 22px;
-            border-radius:10px;
-            font-size:18px;
+            background:#222;
+            color:#fff;
+            padding:12px 18px;
+            border-radius:8px;
             transition:0.3s;
         }
 
-        .botaoAdicionar:hover{
-            background-color:#444;
+        .btn-add:hover{
+            background:#444;
         }
 
-        .capitulo{
-            background-color:white;
-            padding:25px;
-            margin-bottom:20px;
-            border-radius:15px;
-            box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+        .card{
+            background:#fff;
+            padding:20px;
+            margin-bottom:15px;
+            border-radius:12px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
 
             display:flex;
             justify-content:space-between;
@@ -71,33 +70,33 @@
         }
 
         .titulo{
-            font-size:24px;
+            font-size:20px;
             font-weight:bold;
             color:#222;
         }
 
         .acoes{
             display:flex;
-            gap:15px;
+            gap:10px;
         }
 
-        .botao{
+        .btn{
             text-decoration:none;
-            background-color:#222;
-            color:white;
-            padding:10px 18px;
-            border-radius:8px;
+            background:#222;
+            color:#fff;
+            padding:8px 14px;
+            border-radius:6px;
             transition:0.3s;
-            font-size:16px;
+            font-size:14px;
         }
 
-        .botao:hover{
-            background-color:#444;
+        .btn:hover{
+            background:#444;
         }
 
         .vazio{
             text-align:center;
-            font-size:22px;
+            font-size:20px;
             color:#666;
             margin-top:50px;
         }
@@ -107,73 +106,53 @@
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>
-            Capítulos
-        </h1>
+    <h1>Capítulos</h1>
 
-        <p class="nomeLivro">
-            {{ livro.titulo }}
-        </p>
+    <p class="livro">
+        {{ livro.titulo }}
+    </p>
 
-        <div class="topo">
+    <div class="topo">
+        <a class="btn-add"
+           href="{{ url_for('addCapitulo', idLivro=livro.id) }}">
+            + Adicionar Capítulo
+        </a>
+    </div>
 
-            <a 
-                class="botaoAdicionar"
+    {% if capitulos %}
 
-                href="{{ url_for(
-                    'capitulos',
-                    acao='criar',
-                    idLivro=livro.id,
-                    idCapitulo=0
-                ) }}"
-            >
-                + Adicionar Capítulo
-            </a>
+        {% for capitulo in capitulos %}
 
-        </div>
+            <div class="card">
 
-        {% if capitulos %}
+                <div class="titulo">
+                    {{ capitulo.titulo }}
+                </div>
 
-            {% for capitulo in capitulos %}
+                <div class="acoes">
 
-                <div class="capitulo">
-
-                    <p class="titulo">
-                        {{ capitulo.titulo }}
-                    </p>
-
-                    <div class="acoes">
-
-                        <a 
-                            class="botao"
-
-                            href="{{ url_for(
-                                'capitulos',
-                                acao='editar',
-                                idLivro=livro.id,
-                                idCapitulo=capitulo.id
-                            ) }}"
-                        >
-                            Editar
-                        </a>
-
-                    </div>
+                    <a class="btn"
+                       href="{{ url_for('editarCapitulo', idCapitulo=capitulo.idCapitulo) }}">
+                        Editar
+                    </a>
 
                 </div>
 
-            {% endfor %}
+            </div>
 
-        {% else %}
+        {% endfor %}
 
-            <p class="vazio">
-                Nenhum capítulo cadastrado.
-            </p>
+    {% else %}
 
-        {% endif %}
+        <p class="vazio">
+            Nenhum capítulo cadastrado.
+        </p>
 
-    </div>
+    {% endif %}
+
+</div>
 
 </body>
 </html>
