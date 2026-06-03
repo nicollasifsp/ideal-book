@@ -65,7 +65,7 @@
             color: #111;
         }
 
-        /* 🔥 DESCRIÇÃO */
+        
         .descricao{
             margin-top: 12px;
             font-size: 15px;
@@ -82,7 +82,7 @@
             max-height: 1000px;
         }
 
-        /* BOTÃO DESCRIÇÃO */
+        
         .btn-desc{
             margin-top: 10px;
             background: none;
@@ -137,10 +137,34 @@
             margin-top: 40px;
         }
 
+        .botao-atencao {
+            background-color: #dc3545;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: bold;
+                display: block;
+                width: fit-content;
+                margin: 20px auto; 
+                transition: 0.2s;
+        }
+
+        .botao-atencao:hover {
+            background-color: #bb2d3b;
+        }
+
     </style>
 
 </head>
 <body>
+    {% if erro %}
+    <div class="alert-erro">{{ erro }}</div>
+    {% endif %}
+
+    {% if sucesso %}
+    <div class="alert-sucesso">{{ sucesso }}</div>
+    {% endif %}
 
     <h1>Livros</h1>
 
@@ -175,6 +199,9 @@
 
                         <a class="botao" href="{{url_for('menuLivro',idLivro=livro.id)}}">
                             Detalhar livro
+                        </a>
+                        <a class="botao-atencao" href="{{url_for('menuLivro',idLivro=livro.id)}}">
+                            Deletar livro
                         </a>
 
                     </div>

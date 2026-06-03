@@ -199,6 +199,42 @@ def deletarCapituloId(idCapitulo):
     else:
         return render_template("menuLivro.html",erroDelete="erro ao deletar o capítulo",capitulos=capitulos,livro=livro)
     
+@app.route("/deletar/livro/<int:idLivro>")
+def deleterLivroId(idLivro):
+    livro = controllerLivro.getLivroIdLivro(idLivro)
+
+    if not livro:
+        abort(404)
+
+    idSession = session.get("user_id")
+
+    if idSession != livro.idUsuario:
+        abort(403)
+
+    mensagem = controllerLivro.deletarLivro(livro)
+    livros=controllerLivro.getLivroIdLivro(idLivro)
+    if mensagem == False:
+        return render_template(
+            "obras.html",
+            erro="erro ao deletar o livro",
+            livros=livros
+        )
+
+    mensagemCapitulo = controllerCapitulo.deletarCapitulos(livro.id)
+
+    if mensagemCapitulo == False:
+        return render_template(
+            "obras.html",
+            erro="erro ao deletar os capítulos",
+            livros=livros
+        )
+
+    return render_template(
+        "obras.html",
+        sucesso="livro e capítulos deletados com sucesso",
+        livros=livros
+    )
+
 
 if __name__=="__main__":
     with app.app_context():
