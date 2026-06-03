@@ -47,4 +47,14 @@ class ControllerCapitulo():
         except Exception as erro:
             print(f"ocorreu esse erro:\n{erro}")
             return False
+        
+    def deletarCapituloId(self,capitulo):
+        try:
+            db.session.delete(capitulo)
+            db.session.commit()
+            return True
+        except Exception as erro:
+            print(f"erro: {erro}")
+            db.session.rollback() 
+            return False
     

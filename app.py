@@ -166,7 +166,39 @@ def editarCapitulo(idCapitulo):
         else:
              return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
 
+@app.route("/deletar/capitulo/<int:idCapitulo>")
+def deletarCapituloId(idCapitulo):
+    #será que preciso fazer a validação para ver se o livro realmente pertence ao usuário?
+    capitulo=controllerCapitulo.getCapitulo(idCapitulo)
 
+    if not capitulo:
+        abort(400)
+        return 
+    idLivro=capitulo.idLivro
+
+    if not idLivro:
+        return abort(404)
+    
+    livro=controllerLivro.getLivroIdLivro(idLivro)
+    print(f"O ID DO LIVRO É: {idLivro}")
+
+    if not livro:
+        abort(401)
+        return
+    
+    idSession=session.get("user_id")
+    
+    if idSession==livro.idUsuario:
+        mensagem=controllerCapitulo.deletarCapituloId(capitulo)
+        capitulos=controllerCapitulo.getCapitulos(idLivro)
+    else:
+        abort(401)
+        return
+    if mensagem == True:
+        return render_template("menuLivro.html",sucessoDelete="capítulo deletado com sucesso",capitulos=capitulos,livro=livro)
+    else:
+        return render_template("menuLivro.html",erroDelete="erro ao deletar o capítulo",capitulos=capitulos,livro=livro)
+    
 
 if __name__=="__main__":
     with app.app_context():
