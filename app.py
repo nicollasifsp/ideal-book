@@ -7,6 +7,7 @@ from controller.controllerLivro import ControllerLivro
 from controller.controllerCapitulo import ControllerCapitulo
 import os
 from werkzeug.utils import secure_filename
+import uuid
 from dotenv import *
 
 
@@ -20,9 +21,17 @@ app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 db.init_app(app)
-pasta="static"
-app.config['UPLOAD_FOLDER'] = pasta
-os.makedirs(pasta, exist_ok=True)
+
+STATIC_FOLDER = "static"
+IMG_FOLDER = os.path.join(STATIC_FOLDER, "img")
+JS_FOLDER = os.path.join(STATIC_FOLDER, "js")
+CSS_FOLDER = os.path.join(STATIC_FOLDER, "css")
+
+app.config['UPLOAD_FOLDER'] = IMG_FOLDER
+
+os.makedirs(IMG_FOLDER, exist_ok=True)
+os.makedirs(JS_FOLDER, exist_ok=True)
+os.makedirs(CSS_FOLDER, exist_ok=True)
 
 #os renders
 @app.route("/")
@@ -84,9 +93,19 @@ def cadastrarLivro():
     quantPag=int(request.form["quantPag"])
     imagem=request.files["imagem"]
 
-    imagemNome = secure_filename(imagem.filename)
-    caminhoImagem = pasta + "/" + imagemNome
-    imagem.save(caminhoImagem)
+    if imagem and imagem.filename != "":
+
+        # pega extensão do arquivo
+        ext = imagem.filename.split(".")[-1]
+
+        # cria nome único
+        imagemNome = f"{uuid.uuid4()}.{ext}"
+
+        # monta caminho correto
+        caminhoImagem = os.path.join(STATIC_FOLDER, IMG_FOLDER, imagemNome)
+
+        # salva
+        imagem.save(caminhoImagem)
     idUsuario=session.get("user_id")
 
     mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,quantPag,idUsuario)
@@ -165,7 +184,37 @@ def editarCapitulo(idCapitulo):
             return render_template("editarCapitulo.html",sucesso="Capítulo atualizado com sucesso",capitulo=capitulo)
         else:
              return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
+        
+    
+    def autoSave():
+        data = request.json
 
+        idCapitulo = data.get("id")
+        conteudo = data.get("conteudo")
+        titulo = data.get("titulo")
+        idLivro = data.get("idLivro")
+
+        if idCapitulo is None:
+
+            capitulo = controllerCapitulo.salvarCapitulo(titulo, conteudo, idLivro)
+
+            if not capitulo:
+                return jsonify({"error": "erro ao criar"}), 400
+
+            return jsonify({
+                "id": capitulo.idCapitulo
+            })
+
+
+        capitulo = controllerCapitulo.updateCapitulo(idCapitulo, titulo, conteudo)
+
+        if not capitulo:
+            return jsonify({"error": "erro ao atualizar"}), 400
+
+        return jsonify({
+            "id": capitulo.idCapitulo,
+            "status": "ok"
+        })
 
 
 if __name__=="__main__":

@@ -22,7 +22,7 @@ class ControllerCapitulo():
             novoCapitulo=CapituloModel(titulo=titulo,conteudo=conteudo,idLivro=idLivro)
             db.session.add(novoCapitulo)
             db.session.commit()
-            return True
+            return novoCapitulo
         except Exception as erro:
             print(f"ocorreu esse erro:\n{erro}")
             return False
@@ -42,7 +42,7 @@ class ControllerCapitulo():
             capitulo.conteudo = conteudo
 
             db.session.commit()
-            return True
+            return capitulo
 
         except Exception as erro:
             print(f"ocorreu esse erro:\n{erro}")
