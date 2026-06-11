@@ -166,6 +166,7 @@ def editarCapitulo(idCapitulo):
         else:
              return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
 
+
 @app.route("/deletar/capitulo/<int:idCapitulo>")
 def deletarCapituloId(idCapitulo):
     #será que preciso fazer a validação para ver se o livro realmente pertence ao usuário?
@@ -198,7 +199,8 @@ def deletarCapituloId(idCapitulo):
         return render_template("menuLivro.html",sucessoDelete="capítulo deletado com sucesso",capitulos=capitulos,livro=livro)
     else:
         return render_template("menuLivro.html",erroDelete="erro ao deletar o capítulo",capitulos=capitulos,livro=livro)
-    
+
+
 @app.route("/deletar/livro/<int:idLivro>")
 def deleterLivroId(idLivro):
     livro = controllerLivro.getLivroIdLivro(idLivro)
@@ -212,7 +214,7 @@ def deleterLivroId(idLivro):
         abort(403)
 
     mensagem = controllerLivro.deletarLivro(livro)
-    livros=controllerLivro.getLivroIdLivro(idLivro)
+    livros=controllerLivro.getLivrosAutor(idSession)
     if mensagem == False:
         return render_template(
             "obras.html",
@@ -229,10 +231,11 @@ def deleterLivroId(idLivro):
             livros=livros
         )
 
-    return render_template(
-        "obras.html",
+    return redirect(
+        url_for("obras",
         sucesso="livro e capítulos deletados com sucesso",
-        livros=livros
+        livros=livros)
+
     )
 
 
