@@ -3,9 +3,9 @@ from database.db import db
 class ControllerLivro():
     def __init__(self):
         pass
-    def salvarLivro(self,titulo,autor,descricao,caminhoImagem,quantPag,idUsuario):
+    def salvarLivro(self,titulo,autor,descricao,caminhoImagem,idUsuario):
         try:
-            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,caminhoImagem=caminhoImagem,quantPag=quantPag,idUsuario=idUsuario)
+            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,caminhoImagem=caminhoImagem,idUsuario=idUsuario)
             db.session.add(novoLivro)
             db.session.commit()
             return True

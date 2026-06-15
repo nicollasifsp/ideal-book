@@ -81,7 +81,6 @@ def cadastrarLivro():
     autor=request.form["autor"]
     descricao=request.form["descricao"]
     
-    quantPag=int(request.form["quantPag"])
     imagem=request.files["imagem"]
 
     imagemNome = secure_filename(imagem.filename)
@@ -89,7 +88,7 @@ def cadastrarLivro():
     imagem.save(caminhoImagem)
     idUsuario=session.get("user_id")
 
-    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,quantPag,idUsuario)
+    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,idUsuario)
     if mensagem==True:
         return render_template("cadastrarLivro.html",sucesso="Livro adicionado com sucesso.")
     else:
