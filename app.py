@@ -39,11 +39,6 @@ def renderCadastro():
 @app.route("/cadastrarLivro")
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
-
-
-
-
-
 @app.route("/Login",methods=["POST"])
 def fazerLogin():
     email=request.form["email"]
