@@ -3,9 +3,9 @@ from database.db import db
 class ControllerLivro():
     def __init__(self):
         pass
-    def salvarLivro(self,titulo,autor,descricao,caminhoImagem,quantPag,idUsuario):
+    def salvarLivro(self,titulo,autor,descricao,caminhoImagem,idUsuario):
         try:
-            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,caminhoImagem=caminhoImagem,quantPag=quantPag,idUsuario=idUsuario)
+            novoLivro=LivroModel(titulo=titulo,autor=autor,descricao=descricao,caminhoImagem=caminhoImagem,idUsuario=idUsuario)
             db.session.add(novoLivro)
             db.session.commit()
             return True
@@ -30,3 +30,13 @@ class ControllerLivro():
         for livro in livros:
             print(f"id do livro: {livro.id}\ntitulo: {livro.titulo}\n")
             print(f"")
+
+    def deletarLivro(self,livro):
+        try:
+            db.session.delete(livro)
+            db.session.commit
+            return True
+        except Exception as erro:
+            print(f"erro:{erro}")
+            db.sessino.rollback()
+            return False

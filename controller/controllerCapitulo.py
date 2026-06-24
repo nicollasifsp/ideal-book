@@ -22,7 +22,7 @@ class ControllerCapitulo():
             novoCapitulo=CapituloModel(titulo=titulo,conteudo=conteudo,idLivro=idLivro)
             db.session.add(novoCapitulo)
             db.session.commit()
-            return novoCapitulo
+            return True
         except Exception as erro:
             print(f"ocorreu esse erro:\n{erro}")
             return False
@@ -42,9 +42,32 @@ class ControllerCapitulo():
             capitulo.conteudo = conteudo
 
             db.session.commit()
-            return capitulo
+            return True
 
         except Exception as erro:
             print(f"ocorreu esse erro:\n{erro}")
+            return False
+        
+    def deletarCapituloId(self,capitulo):
+        try:
+            db.session.delete(capitulo)
+            db.session.commit()
+            return True
+        except Exception as erro:
+            print(f"erro: {erro}")
+            db.session.rollback() 
+            return False
+        
+    def deletarCapitulos(self,idLivro):
+        try:
+            #aqui vc faça uma deleta em massa todos os capitulos que tem  o id livro igual o idLivro.
+            CapituloModel.query.filter_by(idLivro=idLivro).delete()
+            db.session.commit()
+            return True
+        
+        except Exception as erro:
+            #aqui faça um rollback
+            print(f"erro:{erro}")
+            db.session.rollback()
             return False
     

@@ -23,7 +23,7 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 db.init_app(app)
 
 STATIC_FOLDER = "static"
-IMG_FOLDER = os.path.join(STATIC_FOLDER, "img")
+IMG_FOLDER = os.path.join(STATIC_FOLDER,"img")
 JS_FOLDER = os.path.join(STATIC_FOLDER, "js")
 CSS_FOLDER = os.path.join(STATIC_FOLDER, "css")
 
@@ -48,11 +48,6 @@ def renderCadastro():
 @app.route("/cadastrarLivro")
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
-
-
-
-
-
 @app.route("/Login",methods=["POST"])
 def fazerLogin():
     email=request.form["email"]
@@ -90,7 +85,6 @@ def cadastrarLivro():
     autor=request.form["autor"]
     descricao=request.form["descricao"]
     
-    quantPag=int(request.form["quantPag"])
     imagem=request.files["imagem"]
 
     if imagem and imagem.filename != "":
@@ -102,13 +96,14 @@ def cadastrarLivro():
         imagemNome = f"{uuid.uuid4()}.{ext}"
 
         # monta caminho correto
-        caminhoImagem = os.path.join(STATIC_FOLDER, IMG_FOLDER, imagemNome)
+        caminhoImagem = os.path.join(IMG_FOLDER, imagemNome)
+        print("esse é o caminho da imagem: ",caminhoImagem)
 
         # salva
         imagem.save(caminhoImagem)
     idUsuario=session.get("user_id")
 
-    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,quantPag,idUsuario)
+    mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,idUsuario)
     if mensagem==True:
         return render_template("cadastrarLivro.html",sucesso="Livro adicionado com sucesso.")
     else:
@@ -215,6 +210,77 @@ def editarCapitulo(idCapitulo):
             "id": capitulo.idCapitulo,
             "status": "ok"
         })
+
+@app.route("/deletar/capitulo/<int:idCapitulo>")
+def deletarCapituloId(idCapitulo):
+    #será que preciso fazer a validação para ver se o livro realmente pertence ao usuário?
+    capitulo=controllerCapitulo.getCapitulo(idCapitulo)
+
+    if not capitulo:
+        abort(400)
+        return 
+    idLivro=capitulo.idLivro
+
+    if not idLivro:
+        return abort(404)
+    
+    livro=controllerLivro.getLivroIdLivro(idLivro)
+    print(f"O ID DO LIVRO É: {idLivro}")
+
+    if not livro:
+        abort(401)
+        return
+    
+    idSession=session.get("user_id")
+    
+    if idSession==livro.idUsuario:
+        mensagem=controllerCapitulo.deletarCapituloId(capitulo)
+        capitulos=controllerCapitulo.getCapitulos(idLivro)
+    else:
+        abort(401)
+        return
+    if mensagem == True:
+        return render_template("menuLivro.html",sucessoDelete="capítulo deletado com sucesso",capitulos=capitulos,livro=livro)
+    else:
+        return render_template("menuLivro.html",erroDelete="erro ao deletar o capítulo",capitulos=capitulos,livro=livro)
+
+
+@app.route("/deletar/livro/<int:idLivro>")
+def deleterLivroId(idLivro):
+    livro = controllerLivro.getLivroIdLivro(idLivro)
+
+    if not livro:
+        abort(404)
+
+    idSession = session.get("user_id")
+
+    if idSession != livro.idUsuario:
+        abort(403)
+
+    mensagem = controllerLivro.deletarLivro(livro)
+    livros=controllerLivro.getLivrosAutor(idSession)
+    if mensagem == False:
+        return render_template(
+            "obras.html",
+            erro="erro ao deletar o livro",
+            livros=livros
+        )
+
+    mensagemCapitulo = controllerCapitulo.deletarCapitulos(livro.id)
+
+    if mensagemCapitulo == False:
+        return render_template(
+            "obras.html",
+            erro="erro ao deletar os capítulos",
+            livros=livros
+        )
+
+    return redirect(
+        url_for("obras",
+        sucesso="livro e capítulos deletados com sucesso",
+        livros=livros)
+
+    )
 
 
 if __name__=="__main__":

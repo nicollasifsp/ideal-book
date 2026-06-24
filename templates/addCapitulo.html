@@ -4,20 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        {% if capitulo %}
-            Editar Capítulo
-        {% else %}
-            Criar Capítulo
-        {% endif %}
-    </title>
-
-    <!-- QUILL -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
     <style>
-        /* SEU CSS MANTIDO (sem mudanças importantes) */
-
         *{
             margin:0;
             padding:0;
@@ -53,10 +41,20 @@
             font-size:14px;
         }
 
-        #editor{
-            height:450px;
+        input,
+        textarea{
+            width:100%;
+            padding:12px;
             border:1px solid #d4d4d4;
             border-radius:10px;
+            font-size:16px;
+            margin-bottom:20px;
+        }
+
+        textarea{
+            min-height:450px;
+            resize:vertical;
+            font-family:Arial, Helvetica, sans-serif;
         }
 
         .mensagem{
@@ -77,21 +75,8 @@
             text-align:center;
         }
 
-        .voltar{
-            display:block;
-            margin-top:20px;
-            text-align:center;
-            text-decoration:none;
-            color:#555;
-        }
-
-        .voltar:hover{
-            color:#000;
-        }
-
         button{
             width:100%;
-            margin-top:20px;
             padding:15px;
             border:none;
             border-radius:10px;
@@ -100,20 +85,20 @@
             font-weight:bold;
             cursor:pointer;
         }
+
+        .voltar{
+            display:block;
+            margin-top:20px;
+            text-align:center;
+            text-decoration:none;
+            color:#555;
+        }
     </style>
 </head>
-
 <body>
 
 <div class="container">
 
-    <h1>
-        {% if capitulo %}
-            Editar Capítulo
-        {% else %}
-            Criar Capítulo
-        {% endif %}
-    </h1>
 
     {% if sucesso %}
         <p class="mensagem">{{ sucesso }}</p>
@@ -123,41 +108,35 @@
         <p class="erro">{{ erro }}</p>
     {% endif %}
 
-    <!-- INPUT TÍTULO (IMPORTANTE) -->
-    <label>Título</label>
-    <input type="text"
-           id="titulo"
-           value="{{ capitulo.titulo if capitulo else '' }}">
+    <form action="{{url_for('addCapitulo',idLivro=livro.id)}}" method="POST">
 
-    <br><br>
+        <label for="titulo">Título</label>
+        <input
+            type="text"
+            id="titulo"
+            name="titulo"
+            required
+        >
 
-    <!-- EDITOR QUILL -->
-    <label>Conteúdo</label>
-    <div id="editor"></div>
+        <label for="conteudo">Conteúdo</label>
+        <textarea
+            id="conteudo"
+            name="conteudo"
+            required
+        ></textarea>
 
-    <button onclick="manualSave()">Salvar agora</button>
+        <button type="submit">Salvar</button>
 
-    <a class="voltar"
-       href="{{ url_for('menuLivro', idLivro=livro.id) }}">
+    </form>
+
+    <a
+        class="voltar"
+        href="{{ url_for('menuLivro', idLivro=livro.id) }}"
+    >
         Voltar para a obra
     </a>
 
 </div>
-
-<!-- PASSANDO DADOS PARA JS -->
-<script>
-    window.idCapituloInicial = {{ capitulo.idCapitulo if capitulo else 'null' }};
-    window.idLivro = {{ livro.id }};
-    window.tituloInicial = "{{ capitulo.titulo if capitulo else '' }}";
-    window.conteudoInicial = `{{ capitulo.conteudo|safe if capitulo else '' }}`;
-</script>
-
-<!-- QUILL -->
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<!-- SEUS SCRIPTS -->
-<script src="{{ url_for('static', filename='js/quill.js') }}"></script>
-<script src="{{ url_for('static', filename='js/autosave.js') }}"></script>
 
 </body>
 </html>
