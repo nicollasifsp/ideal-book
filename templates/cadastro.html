@@ -1,172 +1,102 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar usuário</title>
+{% extends "base.html" %}
+{% block title %}Cadastro — Ideal Book{% endblock %}
 
-    <style>
-
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f4f5;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            min-height: 100vh;
-            color: #111;
-        }
-
-        .container{
-            width: 350px;
-        }
-
-        h1{
-            text-align: center;
-            margin-bottom: 30px;
-
-            color: #111;
-            font-size: 32px;
-            font-weight: 600;
-        }
-
-        label{
-            display: block;
-            margin-bottom: 6px;
-
-            color: #333;
-            font-size: 14px;
-        }
-
-        input,
-        select{
-            width: 100%;
-
-            padding: 13px;
-            margin-bottom: 16px;
-
-            border: 1px solid #d4d4d4;
-            border-radius: 8px;
-
-            background: #fff;
-            color: #111;
-
-            font-size: 14px;
-
-            transition: 0.2s;
-        }
-
-        input:focus,
-        select:focus{
-            outline: none;
-            border-color: #7c3aed;
-        }
-
-        button{
-            width: 100%;
-
-            padding: 13px;
-
-            border: none;
-            border-radius: 8px;
-
-            background: #7c3aed;
-            color: white;
-
-            font-size: 15px;
-            font-weight: bold;
-
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover{
-            background: #6d28d9;
-        }
-
-        .erro{
-            background: #fdecea;
-            border: 1px solid #dc3545;
-
-            color: #b71c1c;
-
-            padding: 12px;
-            margin-bottom: 18px;
-
-            border-radius: 8px;
-
-            font-size: 14px;
-        }
-
-        .voltar{
-            display: block;
-
-            margin-top: 18px;
-
-            text-align: center;
-            text-decoration: none;
-
-            color: #555;
-            font-size: 14px;
-        }
-
-        .voltar:hover{
-            color: #000;
-        }
-
-    </style>
-
-</head>
-<body>
-
-<div class="container">
-
-    <h1>Cadastro</h1>
-
-    {% if erro %}
-        <div class="erro">
-            {{ erro }}
+{% block content %}
+<main class="pagina auth-pagina">
+  <div class="auth">
+    <aside class="painel-auth">
+      <div class="painel-capas" aria-hidden="true">
+        <div class="mini-livro m1">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #6d28d9, #c026d3);">
+              <strong>Sua história</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
         </div>
-    {% endif %}
+        <div class="mini-livro m2">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #4c1d95, #7c3aed);">
+              <strong>Novos mundos</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
+        </div>
+        <div class="mini-livro m3">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #7c3aed, #d946ef);">
+              <strong>Capítulo 1</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2>Sua próxima história começa aqui</h2>
+      <p>Crie sua conta em menos de um minuto e escolha como quer viver o Ideal Book.</p>
+      <ul>
+        <li>📚 Biblioteca cheia de livros</li>
+        <li>⭐ Salve favoritos para ler depois</li>
+        <li>✍️ Escreva e publique as suas histórias</li>
+      </ul>
+    </aside>
 
-    <form action="/Cadastro" method="post">
+    <div class="box form-box">
+      <p class="tag">CADASTRO</p>
+      <h1>Criar <span>conta</span></h1>
 
-        <label>Nome</label>
-        <input type="text" name="nome" required>
+      {% if erro %}
+        <div class="alerta-erro">{{ erro }}</div>
+      {% endif %}
 
-        <label>Email</label>
-        <input type="text" name="email" required>
+      <form class="form" action="/Cadastro" method="POST">
+        <div class="campo">
+          <p class="label-form">Eu sou...</p>
+          <input type="hidden" name="tipoUsuario" id="tipoUsuarioInput" value="leitor" />
+          <div class="papeis" role="radiogroup" aria-label="Tipo de conta">
+            <button type="button" class="papel escolhido" data-papel="leitor" onclick="selecionarPapel('leitor', this)">
+              <span class="papel-emoji">📖</span>
+              <strong>Leitor</strong>
+              <span class="papel-texto">Explore a biblioteca, leia e salve seus livros favoritos.</span>
+            </button>
+            <button type="button" class="papel" data-papel="escritor" onclick="selecionarPapel('escritor', this)">
+              <span class="papel-emoji">✍️</span>
+              <strong>Escritor</strong>
+              <span class="papel-texto">Faz tudo que o leitor faz e também escreve e publica livros.</span>
+            </button>
+          </div>
+        </div>
 
-        <label>Senha</label>
-        <input type="password" name="senha" required>
+        <div class="campo">
+          <input type="text" name="nome" placeholder="Seu nome" aria-label="Seu nome" required />
+        </div>
+        <div class="campo">
+          <input type="email" name="email" placeholder="Seu e-mail" aria-label="Seu e-mail" required />
+        </div>
+        <div class="campo">
+          <input type="password" name="senha" placeholder="Senha" aria-label="Senha" required />
+        </div>
+        <div class="campo">
+          <input type="password" name="confirmarSenha" placeholder="Confirme a senha" aria-label="Confirme a senha" required />
+        </div>
 
-        <label>Confirmar senha</label>
-        <input type="password" name="confirmarSenha" required>
+        <button type="submit" class="botao grande">Cadastrar</button>
+      </form>
 
-        <label>Tipo de usuário</label>
+      <p class="troca">
+        Já tem conta?
+        <a class="link" href="{{ url_for('renderLogin') }}">Entrar</a>
+      </p>
+    </div>
+  </div>
+</main>
+{% endblock %}
 
-        <select name="tipoUsuario">
-            <option value="leitor">Leitor</option>
-            <option value="escritor">Escritor</option>
-        </select>
-
-        <button type="submit">Criar conta</button>
-
-    </form>
-
-    <a class="voltar" href="{{ url_for('home') }}">
-        ← Voltar
-    </a>
-
-</div>
-
-</body>
-</html>
+{% block scripts %}
+<script>
+  function selecionarPapel(papel, btn) {
+    document.getElementById('tipoUsuarioInput').value = papel;
+    document.querySelectorAll('.papel').forEach(el => el.classList.remove('escolhido'));
+    btn.classList.add('escolhido');
+  }
+</script>
+{% endblock %}

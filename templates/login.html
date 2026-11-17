@@ -1,151 +1,63 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+{% extends "base.html" %}
+{% block title %}Login — Ideal Book{% endblock %}
 
-    <style>
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f4f5;
-            height: 100vh;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container{
-            width: 340px;
-        }
-
-        h1{
-            color: #111;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 34px;
-            font-weight: 600;
-        }
-
-        label{
-            color: #333;
-            font-size: 14px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        input{
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 18px;
-
-            border: 1px solid #d4d4d4;
-            border-radius: 8px;
-
-            background: #ffffff;
-            color: #111;
-
-            font-size: 15px;
-
-            transition: 0.2s;
-        }
-
-        input:focus{
-            outline: none;
-            border-color: #7c3aed;
-        }
-
-        button{
-            width: 100%;
-            padding: 14px;
-
-            border: none;
-            border-radius: 8px;
-
-            background: #7c3aed;
-            color: white;
-
-            font-size: 15px;
-            font-weight: bold;
-
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover{
-            background: #6d28d9;
-        }
-
-        .erro{
-            background: #fdecea;
-            border: 1px solid #dc3545;
-
-            color: #b71c1c;
-
-            padding: 12px;
-            margin-bottom: 18px;
-
-            border-radius: 8px;
-
-            font-size: 14px;
-        }
-
-        .voltar{
-            display: block;
-            text-align: center;
-
-            margin-top: 18px;
-
-            color: #555;
-            text-decoration: none;
-            font-size: 14px;
-
-            transition: 0.2s;
-        }
-
-        .voltar:hover{
-            color: #000;
-        }
-
-    </style>
-
-</head>
-<body>
-
-<div class="container">
-
-    <h1>Login</h1>
-
-    {% if erro %}
-        <div class="erro">
-            {{ erro }}
+{% block content %}
+<main class="pagina auth-pagina">
+  <div class="auth">
+    <aside class="painel-auth">
+      <div class="painel-capas" aria-hidden="true">
+        <div class="mini-livro m1">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #6d28d9, #c026d3);">
+              <strong>Sua história</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
         </div>
-    {% endif %}
+        <div class="mini-livro m2">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #4c1d95, #7c3aed);">
+              <strong>Novos mundos</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
+        </div>
+        <div class="mini-livro m3">
+          <div class="capa">
+            <div class="capa-falsa" style="background: linear-gradient(155deg, #7c3aed, #d946ef);">
+              <strong>Capítulo 1</strong>
+              <span>Ideal Book</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2>Que bom te ver de novo!</h2>
+      <p>Entre na sua conta para continuar sua leitura ou voltar a escrever.</p>
+    </aside>
 
-    <form action="/Login" method="post">
+    <div class="box form-box">
+      <p class="tag">LOGIN</p>
+      <h1>Entrar na <span>conta</span></h1>
 
-        <label>Email</label>
-        <input type="text" name="email" required>
+      {% if erro %}
+        <div class="alerta-erro">{{ erro }}</div>
+      {% endif %}
 
-        <label>Senha</label>
-        <input type="password" name="senha" required>
+      <form class="form" action="/Login" method="POST">
+        <div class="campo">
+          <input type="email" name="email" placeholder="Seu e-mail" aria-label="Seu e-mail" required />
+        </div>
+        <div class="campo">
+          <input type="password" name="senha" placeholder="Sua senha" aria-label="Sua senha" required />
+        </div>
+        <button type="submit" class="botao grande">Entrar</button>
+      </form>
 
-        <button type="submit">Entrar</button>
-
-    </form>
-
-    <a class="voltar" href="{{ url_for('home') }}">
-        ← Voltar
-    </a>
-
-</div>
-
-</body>
-</html>
+      <p class="troca">
+        Ainda não tem conta?
+        <a class="link" href="{{ url_for('renderCadastro') }}">Cadastre-se</a>
+      </p>
+    </div>
+  </div>
+</main>
+{% endblock %}

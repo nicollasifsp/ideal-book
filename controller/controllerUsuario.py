@@ -23,7 +23,7 @@ class ControllerUsuario():
             resultado= UsuarioModel.query.filter_by(email=email,senha=senha).first()
             return resultado    
     
-    def getUserId(id):
+    def getUserId(self, id):
         usuario=UsuarioModel.query.filter_by(id=id).first()
         return usuario
 

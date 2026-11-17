@@ -34,9 +34,9 @@ class ControllerLivro():
     def deletarLivro(self,livro):
         try:
             db.session.delete(livro)
-            db.session.commit
+            db.session.commit()
             return True
         except Exception as erro:
             print(f"erro:{erro}")
-            db.sessino.rollback()
+            db.session.rollback()
             return False

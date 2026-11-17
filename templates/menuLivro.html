@@ -1,199 +1,64 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capítulos</title>
+{% extends "base.html" %}
+{% block title %}Capítulos — {{ livro.titulo }}{% endblock %}
 
-    <style>
+{% block content %}
+<main class="pagina larga">
+  <a class="voltar" href="{{ url_for('obras') }}">← Minhas obras</a>
 
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
+  {% if sucessoDelete %}
+    <div class="alerta-sucesso" style="max-width: 1000px; margin: 0 auto 20px;">{{ sucessoDelete }}</div>
+  {% endif %}
+  {% if erroDelete %}
+    <div class="alerta-erro" style="max-width: 1000px; margin: 0 auto 20px;">{{ erroDelete }}</div>
+  {% endif %}
 
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background-color:#f4f4f4;
-            padding:40px;
-        }
-
-        .container{
-            max-width:900px;
-            margin:auto;
-        }
-
-        h1{
-            text-align:center;
-            font-size:42px;
-            margin-bottom:10px;
-            color:#222;
-        }
-
-        .livro{
-            text-align:center;
-            font-size:22px;
-            color:#555;
-            margin-bottom:40px;
-        }
-
-        .topo{
-            display:flex;
-            justify-content:flex-end;
-            margin-bottom:25px;
-        }
-
-        .btn-add{
-            text-decoration:none;
-            background:#222;
-            color:#fff;
-            padding:12px 18px;
-            border-radius:8px;
-            transition:0.3s;
-        }
-
-        .btn-add:hover{
-            background:#444;
-        }
-
-        .card{
-            background:#fff;
-            padding:20px;
-            margin-bottom:15px;
-            border-radius:12px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
-
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        }
-
-        .titulo{
-            font-size:20px;
-            font-weight:bold;
-            color:#222;
-        }
-
-        .acoes{
-            display:flex;
-            gap:10px;
-        }
-
-        .btn{
-            text-decoration:none;
-            background:#222;
-            color:#fff;
-            padding:8px 14px;
-            border-radius:6px;
-            transition:0.3s;
-            font-size:14px;
-        }
-
-        .btn:hover{
-            background:#444;
-        }
-
-        .vazio{
-            text-align:center;
-            font-size:20px;
-            color:#666;
-            margin-top:50px;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            margin: 10px 0;
-            border-radius: 6px;
-            font-weight: bold;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Sucesso */
-        .alert-sucesso {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        /* Erro */
-        .alert-erro {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-    </style>
-
-</head>
-<body>
-    {% if sucessoDelete %}
-        <div class="alert alert-sucesso">
-             {{ sucessoDelete }}
-        </div>
-    {% endif %}
-
-    {% if erroDelete %}
-        <div class="alert alert-erro">
-            {{ erroDelete }}
-        </div>
-    {% endif %}
-
-<div class="container">
-
-    <h1>Capítulos</h1>
-
-    <p class="livro">
-        {{ livro.titulo }}
-    </p>
-
-    <div class="topo">
-        <a class="btn-add"
-           href="{{ url_for('addCapitulo', idLivro=livro.id) }}">
-            + Adicionar Capítulo
-        </a>
+  <section class="box">
+    <div class="editor-topo">
+      <p class="tag">EDITANDO OBRA</p>
     </div>
+    <div class="editor-info">
+      <div class="editor-capa">
+        <div class="capa">
+          <img src="{{ url_capa(livro.caminhoImagem) }}" alt="Capa de {{ livro.titulo }}" />
+        </div>
+      </div>
+      <div>
+        <h1 style="font-size: 32px; margin: 0 0 6px;">{{ livro.titulo }}</h1>
+        <p class="autor">por {{ livro.autor }}</p>
+        <p>{{ livro.descricao }}</p>
+        <div class="linha-botoes" style="margin-top: 16px;">
+          <a class="botao" href="{{ url_for('addCapitulo', idLivro=livro.id) }}">+ Novo capítulo</a>
+          <a class="botao-claro" href="{{ url_for('lerLivro', id=livro.id) }}">👁 Pré-visualizar</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <section class="box">
+    <h3>Capítulos</h3>
     {% if capitulos %}
-
+      <ul class="lista-cap">
         {% for capitulo in capitulos %}
-
-            <div class="card">
-
-                <div class="titulo">
-                    {{ capitulo.titulo }}
-                </div>
-
-                <div class="acoes">
-
-                    <a class="btn"
-                       href="{{ url_for('editarCapitulo', idCapitulo=capitulo.idCapitulo) }}">
-                        Editar
-                    </a>
-
-                    <a class="btn"
-                       href="{{ url_for('deletarCapituloId', idCapitulo=capitulo.idCapitulo) }}">
-                        Deletar
-                    </a>
-
-
-                </div>
-
+          <li>
+            <span class="cap-nome">{{ loop.index }}. {{ capitulo.titulo }}</span>
+            <div class="item-botoes">
+              <a class="botao-claro pequeno" href="{{ url_for('editarCapitulo', idCapitulo=capitulo.idCapitulo) }}">Editar</a>
+              <a
+                class="botao-perigo pequeno"
+                href="{{ url_for('deletarCapituloId', idCapitulo=capitulo.idCapitulo) }}"
+                onclick="return confirm('Tem certeza que quer excluir este capítulo?');"
+              >
+                Excluir
+              </a>
             </div>
-
+          </li>
         {% endfor %}
-
+      </ul>
     {% else %}
-
-        <p class="vazio">
-            Nenhum capítulo cadastrado.
-        </p>
-
+      <div class="vazio">
+        <p>Nenhum capítulo cadastrado ainda.</p>
+      </div>
     {% endif %}
-    <a href="{{url_for('obras')}}">Para voltar</a>
-
-</div>
-
-</body>
-</html>
+  </section>
+</main>
+{% endblock %}

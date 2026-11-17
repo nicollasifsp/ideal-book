@@ -1,197 +1,101 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca</title>
+{% extends "base.html" %}
+{% block title %}Biblioteca — Ideal Book{% endblock %}
 
-    <style>
+{% block content %}
+<main class="pagina larga">
+  <section class="topo-pagina">
+    <p class="tag">BIBLIOTECA</p>
+    <h1>Todos os <span>livros</span></h1>
+    <p>Escolha um livro para ler, salve nos favoritos ou pesquise pelo título ou autor.</p>
+  </section>
 
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <form class="filtros" action="{{ url_for('biblioteca') }}" method="GET">
+    <input
+      type="text"
+      name="q"
+      id="filtroBusca"
+      value="{{ busca or '' }}"
+      placeholder="🔎 Pesquisar por título ou autor..."
+      aria-label="Pesquisar livros"
+    />
+    <button type="submit" class="botao">Buscar</button>
+  </form>
 
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f4f5;
-            padding: 40px;
-            color: #111;
-        }
+  <p class="contagem" id="contagemLivros">
+    {{ livros|length }} {{ 'livro encontrado' if livros|length == 1 else 'livros encontrados' }}
+  </p>
 
-        .pai{
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            justify-content: center;
-        }
-
-        .filha{
-            width: 320px;
-            background: white;
-
-            border: 1px solid #e5e5e5;
-            border-radius: 12px;
-
-            overflow: hidden;
-            transition: 0.2s;
-        }
-
-        .filha:hover{
-            border-color: #7c3aed;
-        }
-
-        .filha img{
-            width: 100%;
-            height: 420px;
-            object-fit: cover;
-        }
-
-        .titulo{
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        /* 🔥 DESCRIÇÃO LIMITADA */
-        .descricao{
-            margin-top: 12px;
-            font-size: 15px;
-            color: #555;
-            text-align: justify;
-            line-height: 1.6;
-            padding: 0 15px;
-
-            max-height: 70px;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .descricao.expandida{
-            max-height: 1000px;
-        }
-
-        .btn-desc{
-            display: none;
-            margin: 10px auto 0;
-
-            background: none;
-            border: none;
-
-            color: #7c3aed;
-            font-size: 13px;
-
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .btn-desc:hover{
-            text-decoration: underline;
-        }
-
-        .autor{
-            margin-top: 15px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        a{
-            display: block;
-            margin: 18px;
-
-            text-align: center;
-            text-decoration: none;
-
-            background: #7c3aed;
-            color: white;
-
-            padding: 12px;
-            border-radius: 8px;
-
-            font-size: 15px;
-            font-weight: bold;
-
-            transition: 0.2s;
-        }
-
-        a:hover{
-            background: #6d28d9;
-        }
-
-    </style>
-
-</head>
-<body>
-
-    <div class="pai">
-
-        {% if livros %}
-
-            {% for livro in livros %}
-
-                <div class="filha">
-
-                    <img src="{{ livro.caminhoImagem }}" alt="capa do livro">
-
-                    <p class="titulo">
-                        {{ livro.titulo }}
-                    </p>
-
-                    <p class="descricao" id="desc-{{ livro.id }}">
-                        {{ livro.descricao }}
-                    </p>
-
-                    <button class="btn-desc" id="btn-{{ livro.id }}"
-                            onclick="toggleDesc('{{ livro.id }}')">
-                        Mostrar mais
-                    </button>
-
-                    <p class="autor">
-                        {{ livro.autor }}
-                    </p>
-
-                    <a href="{{ url_for('lerLivro', id=livro.id) }}">
-                        Ler livro
-                    </a>
-
-                </div>
-
-            {% endfor %}
-
-        {% endif %}
-
+  {% if livros %}
+    <div class="cards" id="gridLivros">
+      {% for livro in livros %}
+        <article class="card" data-texto="{{ (livro.titulo ~ ' ' ~ livro.autor)|lower }}">
+          <div class="capa-card">
+            <div class="capa">
+              <img src="{{ url_capa(livro.caminhoImagem) }}" alt="Capa de {{ livro.titulo }}" />
+            </div>
+          </div>
+          <h3>{{ livro.titulo }}</h3>
+          <p>{{ livro.autor }}</p>
+          <p class="card-desc" id="desc-{{ livro.id }}">{{ livro.descricao }}</p>
+          <button type="button" class="btn-desc-toggle" id="btn-desc-{{ livro.id }}" style="display: none;" onclick="toggleDesc('{{ livro.id }}')">
+            Mostrar mais
+          </button>
+          <div class="card-botoes">
+            <a class="botao" href="{{ url_for('lerLivro', id=livro.id) }}">Ler</a>
+            <form class="form-fav" action="{{ url_for('favoritar', idLivro=livro.id) }}" method="POST" onsubmit="alternarFavorito(this, event)">
+              <button type="submit" class="botao-claro" data-texto-salvo="★ Salvo" data-texto-salvar="☆ Salvar">
+                {{ '★ Salvo' if livro.id in favoritos_ids else '☆ Salvar' }}
+              </button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
     </div>
+  {% else %}
+    <div class="vazio">
+      <p>Nenhum livro encontrado 😕</p>
+      {% if busca %}
+        <a class="botao-claro" href="{{ url_for('biblioteca') }}">Limpar filtros</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</main>
+{% endblock %}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const descricoes = document.querySelectorAll(".descricao");
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.card-desc').forEach(desc => {
+      if (desc.scrollHeight > desc.clientHeight + 2) {
+        const id = desc.id.replace('desc-', '');
+        const btn = document.getElementById('btn-desc-' + id);
+        if (btn) btn.style.display = 'inline-block';
+      }
+    });
 
-            descricoes.forEach(desc => {
-                const btn = desc.nextElementSibling;
-
-                if (desc.scrollHeight > desc.clientHeight) {
-                    btn.style.display = "block";
-                }
-            });
+    const input = document.getElementById('filtroBusca');
+    const contagem = document.getElementById('contagemLivros');
+    if (input) {
+      input.addEventListener('input', () => {
+        const termo = input.value.trim().toLowerCase();
+        let visiveis = 0;
+        document.querySelectorAll('#gridLivros .card').forEach(card => {
+          const bate = card.dataset.texto.includes(termo);
+          card.style.display = bate ? 'flex' : 'none';
+          if (bate) visiveis++;
         });
-
-        function toggleDesc(id){
-            const desc = document.getElementById("desc-" + id);
-            const btn = document.getElementById("btn-" + id);
-
-            desc.classList.toggle("expandida");
-
-            if(desc.classList.contains("expandida")){
-                btn.innerText = "Mostrar menos";
-            } else {
-                btn.innerText = "Mostrar mais";
-            }
+        if (contagem) {
+          contagem.textContent = visiveis + (visiveis === 1 ? ' livro encontrado' : ' livros encontrados');
         }
-    </script>
+      });
+    }
+  });
 
-</body>
-</html>
+  function toggleDesc(id) {
+    const desc = document.getElementById('desc-' + id);
+    const btn = document.getElementById('btn-desc-' + id);
+    desc.classList.toggle('expandida');
+    btn.textContent = desc.classList.contains('expandida') ? 'Mostrar menos' : 'Mostrar mais';
+  }
+</script>
+{% endblock %}
