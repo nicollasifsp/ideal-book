@@ -15,7 +15,8 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_jwt_extended import (
     JWTManager, create_access_token,
-    get_jwt_identity, verify_jwt_in_request,
+    get_jwt_identity, get_jwt,
+    verify_jwt_in_request,
     set_access_cookies, unset_jwt_cookies
 )
 
@@ -66,6 +67,27 @@ def login_obrigatorio(view):
 
     return wrapper
 
+# LOGIN OBRIGATORIO TIPO DE USUARIO:
+def tipo_usuario_obrigatorio(tipo):
+    def decorator(view):
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+
+            try:
+                verify_jwt_in_request()
+            except Exception:
+                return redirect(url_for("renderLogin"))
+
+            usuario = get_jwt()
+
+            if usuario.get("tipoUsuario") != tipo:
+                abort(403)
+
+            return view(*args, **kwargs)
+
+        return wrapper
+    return decorator
+
 #os renders
 @app.route("/")
 def home():
@@ -79,27 +101,38 @@ def renderCadastro():
     return render_template("cadastro.html")
 
 @app.route("/cadastrarLivro")
+@tipo_usuario_obrigatorio("escritor")
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
 
-@app.route("/Login",methods=["POST"])
+@app.route("/Login", methods=["POST"])
 def fazerLogin():
-    email=request.form["email"]
-    senha=request.form["senha"]
-    mensagemLogin=controllerUsuario.fazerLogin(email,senha)
-    if mensagemLogin==False:
-        return render_template("login.html",erro="Usuário não encontrado, tente criar uma conta")
+    email = request.form["email"]
+    senha = request.form["senha"]
+
+    mensagemLogin = controllerUsuario.fazerLogin(email, senha)
+
+    if mensagemLogin == False:
+        return render_template(
+            "login.html",
+            erro="Usuário não encontrado, tente criar uma conta"
+        )
+
+    token = create_access_token(
+        identity=str(mensagemLogin.id),
+        additional_claims={
+            "tipoUsuario": mensagemLogin.tipoUsuario
+        }
+    )
+
+    if mensagemLogin.tipoUsuario == "leitor":
+        resposta = redirect(url_for("biblioteca"))
     else:
-        #gerar token
-        token=create_access_token(indentity=str(mensagemLogin.id))
-        session["user_id"] = mensagemLogin.id
-        if mensagemLogin.tipoUsuario == "leitor":
-            resposta= redirect(url_for("biblioteca"))
-        else:
-            resposta= redirect(url_for("renderCadastrarLivro"))
-        # adicionar JWT a resposta
-        set_access_cookies(resposta, token)
-        return resposta
+        resposta = redirect(url_for("renderCadastrarLivro"))
+
+    set_access_cookies(resposta, token)
+
+    return resposta
         
 
 @app.route('/Cadastro',methods=["POST"])
@@ -120,9 +153,8 @@ def fazerCadastro():
         return render_template("cadastro.html",erro="Esse usuário já foi cadastrado")
     
 @app.route("/cadastrarLivro",methods=["POST"])
-
+@tipo_usuario_obrigatorio("escritor")
 def cadastrarLivro():
-
     titulo=request.form["titulo"]
     autor=request.form["autor"]
     descricao=request.form["descricao"]
@@ -143,7 +175,7 @@ def cadastrarLivro():
 
         # salva
         imagem.save(caminhoImagem)
-    idUsuario=session.get("user_id")
+    idUsuario=int(get_jwt_identity())
 
     mensagem=controllerLivro.salvarLivro(titulo,autor,descricao,caminhoImagem,idUsuario)
     if mensagem==True:
@@ -152,11 +184,13 @@ def cadastrarLivro():
         return render_template("cadastrarLivro.html",erro="infezmente occoreu um erro, tente novamante")
 
 @app.route("/biblioteca")
+@login_obrigatorio
 def biblioteca():
     livros=controllerLivro.getLivros()
     return render_template("biblioteca.html",livros=livros)
 
 @app.route("/lerLivro/<id>")
+@login_obrigatorio
 def lerLivro(id):
     idLivro=int(id)
     livro=controllerLivro.getLivroIdLivro(idLivro)
@@ -164,6 +198,7 @@ def lerLivro(id):
     return render_template("lerLivro.html",capitulos=capitulos,livro=livro)
 
 @app.route("/lerCapitulo/<int:idCapitulo>")
+@login_obrigatorio
 def lerCapitulo(idCapitulo):
     capitulo=controllerCapitulo.getCapitulo(idCapitulo)
     return render_template("lerCapitulo.html",capitulo=capitulo)
@@ -171,16 +206,18 @@ def lerCapitulo(idCapitulo):
     
 
 @app.route("/obras")
+@login_obrigatorio
 def obras():
-    idUsuario=session.get("user_id")
+    idUsuario=int(get_jwt_identity())
     livros=controllerLivro.getLivrosAutor(idUsuario)
     
     return render_template("obras.html",livros=livros)
 
 @app.route("/obras/<int:idLivro>")
+@login_obrigatorio
 def menuLivro(idLivro):
     livro=controllerLivro.getLivroIdLivro(idLivro)
-    idSession=session.get("user_id")
+    idSession=int(get_jwt_identity())
     if not livro:
         abort(404)
         return
@@ -192,6 +229,7 @@ def menuLivro(idLivro):
         return
 
 @app.route("/obras/adicionar/<int:idLivro>",methods=["POST","GET"])
+@tipo_usuario_obrigatorio("escritor")
 def addCapitulo(idLivro):
     livro=controllerLivro.getLivroIdLivro(idLivro)
     if request.method=="GET":
@@ -207,7 +245,7 @@ def addCapitulo(idLivro):
             return render_template("addCapitulo.html",erro="infelizmente occoreu um erro, tente novamente mais tarde.",livro=livro)
 
 @app.route("/obras/editar/<int:idCapitulo>",methods=["GET","POST"])
-
+@tipo_usuario_obrigatorio("escritor")
 def editarCapitulo(idCapitulo):
     
     capitulo=controllerCapitulo.getCapitulo(idCapitulo)
@@ -223,37 +261,10 @@ def editarCapitulo(idCapitulo):
             return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
         
     
-    def autoSave():
-        data = request.json
 
-        idCapitulo = data.get("id")
-        conteudo = data.get("conteudo")
-        titulo = data.get("titulo")
-        idLivro = data.get("idLivro")
-
-        if idCapitulo is None:
-
-            capitulo = controllerCapitulo.salvarCapitulo(titulo, conteudo, idLivro)
-
-            if not capitulo:
-                return jsonify({"error": "erro ao criar"}), 400
-
-            return jsonify({
-                "id": capitulo.idCapitulo
-            })
-
-
-        capitulo = controllerCapitulo.updateCapitulo(idCapitulo, titulo, conteudo)
-
-        if not capitulo:
-            return jsonify({"error": "erro ao atualizar"}), 400
-
-        return jsonify({
-            "id": capitulo.idCapitulo,
-            "status": "ok"
-        })
 
 @app.route("/deletar/capitulo/<int:idCapitulo>")
+@tipo_usuario_obrigatorio("escritor")
 def deletarCapituloId(idCapitulo):
     #será que preciso fazer a validação para ver se o livro realmente pertence ao usuário?
     capitulo=controllerCapitulo.getCapitulo(idCapitulo)
@@ -273,7 +284,7 @@ def deletarCapituloId(idCapitulo):
         abort(401)
         return
     
-    idSession=session.get("user_id")
+    idSession=int(get_jwt_identity())
     
     if idSession==livro.idUsuario:
         mensagem=controllerCapitulo.deletarCapituloId(capitulo)
@@ -288,13 +299,14 @@ def deletarCapituloId(idCapitulo):
 
 
 @app.route("/deletar/livro/<int:idLivro>")
+@tipo_usuario_obrigatorio("escritor")
 def deleterLivroId(idLivro):
     livro = controllerLivro.getLivroIdLivro(idLivro)
 
     if not livro:
         abort(404)
 
-    idSession = session.get("user_id")
+    idSession = int(get_jwt_identity())
 
     if idSession != livro.idUsuario:
         abort(403)
@@ -323,6 +335,13 @@ def deleterLivroId(idLivro):
         livros=livros)
 
     )
+    
+# Logout    
+@app.route("/logout")
+def logout():
+    resposta = redirect(url_for("renderLogin"))
+    unset_jwt_cookies(resposta)
+    return resposta
 
 
 if __name__=="__main__":
