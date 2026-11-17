@@ -1,104 +1,117 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página inicial</title>
+{% extends "base.html" %}
+{% block title %}Ideal Book — Livraria Digital{% endblock %}
 
-    <style>
-
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background: whitesmoke;
-            height: 100vh;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container{
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1{
-            color: black;
-            font-size: 40px;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .botoes{
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-        }
-
-        a{
-            text-decoration: none;
-            padding: 12px 22px;
-
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-
-            transition: 0.2s ease;
-        }
-
-        /* botão principal */
-        .login{
-            background: #8b5cf6;
-            color: white;
-            border: 1px solid transparent;
-        }
-
-        .login:hover{
-            background: #7c3aed;
-            transform: translateY(-1px);
-        }
-
-        /* botão secundário */
-        .cadastro{
-            background: #27272a;
-            border: 1px solid #3f3f46;
-            color: #d4d4d8;
-        }
-
-        .cadastro:hover{
-            border-color: #8b5cf6;
-            color: #f4f4f5;
-            transform: translateY(-1px);
-        }
-
-    </style>
-
-</head>
-<body>
-
-    <div class="container">
-
-        <h1>Bem-vindo</h1>
-
-        <div class="botoes">
-
-            <a class="login" href="{{ url_for('renderLogin') }}">
-                Login
-            </a>
-
-            <a class="cadastro" href="{{ url_for('renderCadastro') }}">
-                Novo usuário
-            </a>
-
-        </div>
-
+{% block content %}
+<main>
+  <section class="hero">
+    <div class="hero-texto">
+      {% if usuario_atual %}
+        <p class="tag">OI, {{ usuario_atual.nome.split(' ')[0].upper() }}! 👋</p>
+      {% else %}
+        <p class="tag">BEM-VINDO AO IDEAL BOOK 👋</p>
+      {% endif %}
+      <h1>
+        Encontre o livro <span>ideal</span> para você.
+      </h1>
+      <p>
+        O Ideal Book ajuda você a descobrir histórias de acordo com seus gostos, interesses e momento.
+        {% if usuario_atual and usuario_atual.tipoUsuario == 'escritor' %}
+          E como escritor, você também pode criar e publicar as suas!
+        {% endif %}
+      </p>
+      <form class="busca" action="{{ url_for('biblioteca') }}" method="GET">
+        <input
+          type="text"
+          name="q"
+          placeholder="Digite título ou autor..."
+          aria-label="Buscar livros"
+        />
+        <button type="submit">🔎 Buscar</button>
+      </form>
     </div>
 
-</body>
-</html>
+    <div class="hero-livros" aria-hidden="true">
+      <div class="hero-livro h1">
+        <div class="capa">
+          <div class="capa-falsa" style="background: linear-gradient(155deg, #6d28d9, #c026d3);">
+            <strong>Sua história</strong>
+            <span>Ideal Book</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-livro h2">
+        <div class="capa">
+          <div class="capa-falsa" style="background: linear-gradient(155deg, #4c1d95, #7c3aed);">
+            <strong>Novos mundos</strong>
+            <span>Ideal Book</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-livro h3">
+        <div class="capa">
+          <div class="capa-falsa" style="background: linear-gradient(155deg, #7c3aed, #d946ef);">
+            <strong>Capítulo 1</strong>
+            <span>Ideal Book</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if livros %}
+  <section class="conteudo">
+    <h2>Alguns livros para começar</h2>
+    <div class="cards">
+      {% for livro in livros %}
+        <article class="card">
+          <div class="capa-card">
+            <div class="capa">
+              <img src="{{ url_capa(livro.caminhoImagem) }}" alt="Capa de {{ livro.titulo }}" />
+            </div>
+          </div>
+          <h3>{{ livro.titulo }}</h3>
+          <p>{{ livro.autor }}</p>
+          <div class="card-botoes">
+            <a class="botao" href="{{ url_for('lerLivro', id=livro.id) }}">Ler</a>
+            {% if usuario_atual %}
+              <form class="form-fav" action="{{ url_for('favoritar', idLivro=livro.id) }}" method="POST" onsubmit="alternarFavorito(this, event)">
+                <button type="submit" class="botao-claro" data-texto-salvo="★ Salvo" data-texto-salvar="☆ Salvar">
+                  {{ '★ Salvo' if livro.id in favoritos_ids else '☆ Salvar' }}
+                </button>
+              </form>
+            {% else %}
+              <a class="botao-claro" href="{{ url_for('renderLogin') }}">☆ Salvar</a>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    <p class="ver-mais">
+      <a class="botao-claro" href="{{ url_for('biblioteca') }}">Ver biblioteca completa</a>
+    </p>
+  </section>
+  {% endif %}
+
+  <section class="destaque">
+    {% if usuario_atual and usuario_atual.tipoUsuario == 'escritor' %}
+      <h2>Tem uma história para contar?</h2>
+      <p>
+        Escreva seus livros capítulo por capítulo e publique para outras pessoas lerem na biblioteca.
+      </p>
+      <a class="botao-branco" href="{{ url_for('obras') }}">Ir para meus livros</a>
+    {% elif usuario_atual %}
+      <h2>Explore seus favoritos</h2>
+      <p>
+        Salve os livros que chamaram sua atenção na biblioteca e acesse sua coleção sempre que quiser continuar lendo.
+      </p>
+      <a class="botao-branco" href="{{ url_for('favoritos') }}">Ver meus favoritos</a>
+    {% else %}
+      <h2>Pronto para começar a ler?</h2>
+      <p>
+        Crie sua conta gratuitamente como leitor ou escritor e mergulhe nas histórias da nossa biblioteca digital.
+      </p>
+      <a class="botao-branco" href="{{ url_for('renderCadastro') }}">Criar conta grátis</a>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

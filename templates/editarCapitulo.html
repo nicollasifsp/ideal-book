@@ -1,131 +1,57 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Capítulo</title>
+{% extends "base.html" %}
+{% block title %}Editar Capítulo — Ideal Book{% endblock %}
 
-    <style>
+{% block content %}
+<main class="pagina larga">
+  <a class="voltar" href="{{ url_for('menuLivro', idLivro=capitulo.idLivro) }}">← Voltar para a obra</a>
 
-        body{
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 30px;
-        }
+  <section class="box">
+    <p class="tag">EDITANDO CAPÍTULO</p>
+    <h1 style="font-size: 32px; margin: 10px 0 20px;">Editar <span>capítulo</span></h1>
 
-        .container{
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+    {% if sucesso %}
+      <div class="alerta-sucesso">{{ sucesso }}</div>
+    {% endif %}
+    {% if erro %}
+      <div class="alerta-erro">{{ erro }}</div>
+    {% endif %}
 
-        h1{
-            margin-bottom: 20px;
-        }
+    <form class="form" method="POST">
+      <div class="campo">
+        <label class="label-form" for="titulo">Título do capítulo</label>
+        <input type="text" id="titulo" name="titulo" value="{{ capitulo.titulo }}" required />
+      </div>
 
-        .voltar{
-            display: inline-block;
-            margin-top: 15px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .mensagem{
-            max-width: 900px;
-            margin: 15px auto;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .sucesso{
-            background-color: #e6f9ed;
-            color: #1e7e34;
-            border-left: 6px solid #28a745;
-        }
-
-        .erro{
-            background-color: #fdecea;
-            color: #b71c1c;
-            border-left: 6px solid #dc3545;
-        }
-
-        input,
-        textarea{
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-
-        textarea{
-            min-height: 400px;
-            resize: vertical;
-            font-family: Arial, sans-serif;
-        }
-
-        button{
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #7c3aed;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-    </style>
-</head>
-
-<body>
-
-{% if sucesso %}
-    <div class="mensagem sucesso">{{ sucesso }}</div>
-{% endif %}
-
-{% if erro %}
-    <div class="mensagem erro">{{ erro }}</div>
-{% endif %}
-
-<div class="container">
-
-    <h1>Editar capítulo</h1>
-
-    <form method="POST">
-
-        <label>Título</label>
-        <input
-            type="text"
-            name="titulo"
-            value="{{ capitulo.titulo }}"
-            required
-        >
-
-        <label>Conteúdo</label>
+      <div class="campo">
+        <label class="label-form" for="conteudo">Conteúdo</label>
         <textarea
-            name="conteudo"
-            required
+          class="editor-texto"
+          id="conteudo"
+          name="conteudo"
+          oninput="atualizarContagem(this)"
+          required
         >{{ capitulo.conteudo }}</textarea>
+        <span class="pequeno-texto" id="contagemPalavras">0 palavras</span>
+      </div>
 
-        <button type="submit">Salvar Alterações</button>
-
+      <div class="linha-botoes">
+        <button type="submit" class="botao">💾 Salvar alterações</button>
+        <a class="botao-claro" href="{{ url_for('menuLivro', idLivro=capitulo.idLivro) }}">Voltar</a>
+      </div>
     </form>
+  </section>
+</main>
+{% endblock %}
 
-    <a
-        class="voltar"
-        href="{{ url_for('menuLivro', idLivro=capitulo.idLivro) }}"
-    >
-        Voltar para a obra
-    </a>
-
-</div>
-
-</body>
-</html>
+{% block scripts %}
+<script>
+  function atualizarContagem(textarea) {
+    const texto = textarea.value.trim();
+    const palavras = texto === '' ? 0 : texto.split(/\s+/).length;
+    document.getElementById('contagemPalavras').textContent = palavras + (palavras === 1 ? ' palavra' : ' palavras');
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    atualizarContagem(document.getElementById('conteudo'));
+  });
+</script>
+{% endblock %}

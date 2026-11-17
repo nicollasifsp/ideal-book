@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Favoritos — Ideal Book{% endblock %}
+
+{% block content %}
+<main class="pagina larga">
+  <section class="topo-pagina">
+    <p class="tag">COLEÇÃO</p>
+    <h1>Livros <span>favoritos</span></h1>
+    <p>Os livros que você salvou para ler quando quiser.</p>
+  </section>
+
+  {% if not livros %}
+    <div class="vazio">
+      <p>Você ainda não favoritou nenhum livro ⭐</p>
+      <a class="botao" href="{{ url_for('biblioteca') }}">Ver biblioteca</a>
+    </div>
+  {% else %}
+    <div class="cards">
+      {% for livro in livros %}
+        <article class="card">
+          <div class="capa-card">
+            <div class="capa">
+              <img src="{{ url_capa(livro.caminhoImagem) }}" alt="Capa de {{ livro.titulo }}" />
+            </div>
+          </div>
+          <h3>{{ livro.titulo }}</h3>
+          <p>{{ livro.autor }}</p>
+          <p class="card-desc">{{ livro.descricao }}</p>
+          <div class="card-botoes">
+            <a class="botao" href="{{ url_for('lerLivro', id=livro.id) }}">Ler</a>
+            <form class="form-fav" action="{{ url_for('favoritar', idLivro=livro.id) }}" method="POST" data-remover-card="true" onsubmit="alternarFavorito(this, event)">
+              <button type="submit" class="botao-claro" data-texto-salvo="★ Salvo" data-texto-salvar="☆ Salvar">
+                ★ Salvo
+              </button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+</main>
+{% endblock %}

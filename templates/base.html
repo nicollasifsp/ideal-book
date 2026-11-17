@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#7c3aed" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=Nunito:wght@400;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <title>{% block title %}Ideal Book{% endblock %}</title>
+</head>
+<body>
+  <header class="header">
+    <a class="logo" href="{{ url_for('home') }}">
+      <span class="logo-emoji">📚</span>
+      <span class="logo-textos">
+        <span class="logo-titulo">Ideal Book</span>
+        <span class="logo-sub">LIVRARIA DIGITAL</span>
+      </span>
+    </a>
+
+    <nav class="menu desktop">
+      <a href="{{ url_for('home') }}" class="{{ 'ativo' if request.endpoint == 'home' else '' }}">Home</a>
+      {% if usuario_atual %}
+        <a href="{{ url_for('biblioteca') }}" class="{{ 'ativo' if request.endpoint in ['biblioteca', 'lerLivro', 'lerCapitulo'] else '' }}">Biblioteca</a>
+        <a href="{{ url_for('favoritos') }}" class="{{ 'ativo' if request.endpoint == 'favoritos' else '' }}">Favoritos</a>
+        {% if usuario_atual.tipoUsuario == 'escritor' %}
+          <a href="{{ url_for('obras') }}" class="{{ 'ativo' if request.endpoint in ['obras', 'menuLivro', 'addCapitulo', 'editarCapitulo'] else '' }}">Minhas Obras</a>
+          <a href="{{ url_for('renderCadastrarLivro') }}" class="{{ 'ativo' if request.endpoint == 'renderCadastrarLivro' else '' }}">Escrever</a>
+        {% endif %}
+      {% endif %}
+    </nav>
+
+    <div class="menu-conta desktop">
+      {% if usuario_atual %}
+        <span class="ola">Olá, {{ usuario_atual.nome.split(' ')[0] }}</span>
+        <span class="chip-papel">
+          {{ '✍️ Escritor' if usuario_atual.tipoUsuario == 'escritor' else '📖 Leitor' }}
+        </span>
+        <a class="botao-claro pequeno" href="{{ url_for('logout') }}">Sair</a>
+      {% else %}
+        <a class="botao-claro pequeno" href="{{ url_for('renderLogin') }}">Entrar</a>
+        <a class="botao pequeno" href="{{ url_for('renderCadastro') }}">Cadastrar</a>
+      {% endif %}
+    </div>
+
+    <button class="hamb" type="button" onclick="toggleSidebar(true)" aria-label="Abrir menu">
+      ☰
+    </button>
+
+    <div class="overlay" id="menuOverlay" onclick="toggleSidebar(false)"></div>
+
+    <nav class="sidebar" id="menuSidebar">
+      <div class="sidebar-topo">
+        <span class="logo">📚 Ideal Book</span>
+        <button class="fechar" type="button" onclick="toggleSidebar(false)" aria-label="Fechar menu">✕</button>
+      </div>
+
+      {% if usuario_atual %}
+        <p class="sidebar-ola">
+          Olá, {{ usuario_atual.nome.split(' ')[0] }}!
+          <span class="chip-papel">
+            {{ '✍️ Escritor' if usuario_atual.tipoUsuario == 'escritor' else '📖 Leitor' }}
+          </span>
+        </p>
+      {% endif %}
+
+      <a href="{{ url_for('home') }}">🏠 Home</a>
+      {% if usuario_atual %}
+        <a href="{{ url_for('biblioteca') }}">📚 Biblioteca</a>
+        <a href="{{ url_for('favoritos') }}">⭐ Favoritos</a>
+        {% if usuario_atual.tipoUsuario == 'escritor' %}
+          <a href="{{ url_for('obras') }}">📖 Minhas Obras</a>
+          <a href="{{ url_for('renderCadastrarLivro') }}">✍️ Escrever</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">🚪 Sair</a>
+      {% else %}
+        <a href="{{ url_for('renderLogin') }}">🔑 Entrar</a>
+        <a href="{{ url_for('renderCadastro') }}">📝 Cadastrar</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="rodape">
+    <p class="rodape-texto">© 2026 Ideal Book — Livraria Digital</p>
+    <p class="rodape-creditos">Histórias para ler, salvar e escrever</p>
+  </footer>
+
+  <script>
+    function toggleSidebar(abrir) {
+      const overlay = document.getElementById('menuOverlay');
+      const sidebar = document.getElementById('menuSidebar');
+      if (abrir) {
+        overlay.classList.add('visivel');
+        sidebar.classList.add('aberta');
+      } else {
+        overlay.classList.remove('visivel');
+        sidebar.classList.remove('aberta');
+      }
+    }
+
+    async function alternarFavorito(form, evento) {
+      evento.preventDefault();
+      const botao = form.querySelector('button[type="submit"]');
+      try {
+        const resposta = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (resposta.redirected) {
+          window.location.href = resposta.url;
+          return;
+        }
+        if (!resposta.ok) {
+          form.submit();
+          return;
+        }
+        const dados = await resposta.json();
+        const textoSalvar = botao.dataset.textoSalvar || '☆ Salvar';
+        const textoSalvo = botao.dataset.textoSalvo || '★ Salvo';
+        botao.textContent = dados.favorito ? textoSalvo : textoSalvar;
+
+        if (!dados.favorito && form.dataset.removerCard === 'true') {
+          const card = form.closest('.card');
+          if (card) {
+            card.remove();
+            const restante = document.querySelectorAll('.cards .card').length;
+            if (restante === 0) {
+              window.location.reload();
+            }
+          }
+        }
+      } catch (e) {
+        form.submit();
+      }
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,119 +1,53 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ livro.titulo }}</title>
+{% extends "base.html" %}
+{% block title %}{{ livro.titulo }} — Ideal Book{% endblock %}
 
-    <style>
+{% block content %}
+<main class="pagina leitor">
+  <a class="voltar" href="{{ url_for('biblioteca') }}">← Voltar para a biblioteca</a>
 
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <section class="leitor-topo box">
+    <div class="capa-pequena">
+      <div class="capa">
+        <img src="{{ url_capa(livro.caminhoImagem) }}" alt="Capa de {{ livro.titulo }}" />
+      </div>
+    </div>
+    <div>
+      <h1>{{ livro.titulo }}</h1>
+      <p class="autor">por {{ livro.autor }}</p>
+      <p>{{ livro.descricao }}</p>
+      <div class="linha-botoes" style="margin-top: 16px;">
+        <form action="{{ url_for('favoritar', idLivro=livro.id) }}" method="POST" onsubmit="alternarFavorito(this, event)">
+          <button
+            type="submit"
+            class="botao-claro"
+            data-texto-salvo="★ Salvo nos favoritos"
+            data-texto-salvar="☆ Salvar nos favoritos"
+          >
+            {{ '★ Salvo nos favoritos' if is_favorito else '☆ Salvar nos favoritos' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
 
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 0;
-            background: #f4f4f5;
-            color: #111;
-        }
+  <section class="box">
+    <p class="tag">SUMÁRIO</p>
+    <h2 style="margin-top: 8px;">Capítulos</h2>
 
-        .container{
-            max-width: 850px;
-            margin: 50px auto;
-            padding: 30px;
-        }
-
-        h1{
-            font-size: 38px;
-            margin-bottom: 30px;
-            color: #111;
-        }
-
-        .capitulo{
-            background: white;
-            border: 1px solid #e5e5e5;
-
-            padding: 18px 22px;
-            margin-bottom: 12px;
-
-            border-radius: 10px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            transition: 0.15s;
-        }
-
-        .capitulo:hover{
-            border-color: #7c3aed;
-        }
-
-        .capitulo h2{
-            font-size: 17px;
-            margin: 0;
-            color: #222;
-        }
-
-        .capitulo a{
-            text-decoration: none;
-
-            background: #7c3aed;
-            color: white;
-
-            padding: 8px 14px;
-            border-radius: 8px;
-
-            font-size: 14px;
-            font-weight: bold;
-
-            transition: 0.2s;
-        }
-
-        .capitulo a:hover{
-            background: #6d28d9;
-        }
-
-        .voltar{
-            display: inline-block;
-
-            margin-top: 25px;
-
-            text-decoration: none;
-            color: #555;
-            font-size: 14px;
-        }
-
-        .voltar:hover{
-            color: #000;
-        }
-
-    </style>
-
-</head>
-<body>
-
-<div class="container">
-
-    <h1>{{ livro.titulo }}</h1>
-
-    {% for capitulo in capitulos %}
-        <div class="capitulo">
-            <h2>{{ capitulo.titulo }}</h2>
-
-            <a href="{{ url_for('lerCapitulo', idCapitulo=capitulo.idCapitulo) }}">
-                Ler
-            </a>
-        </div>
-    {% endfor %}
-
-    <a class="voltar" href="{{ url_for('biblioteca') }}">
-        ← Voltar para a biblioteca
-    </a>
-
-</div>
-
-</body>
-</html>
+    {% if capitulos %}
+      <ul class="lista-cap">
+        {% for capitulo in capitulos %}
+          <li>
+            <span class="cap-nome">{{ loop.index }}. {{ capitulo.titulo }}</span>
+            <a class="botao pequeno" href="{{ url_for('lerCapitulo', idCapitulo=capitulo.idCapitulo) }}">Ler</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="vazio">
+        <p>Este livro ainda não possui capítulos publicados.</p>
+      </div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

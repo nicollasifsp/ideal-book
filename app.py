@@ -2,9 +2,12 @@ from flask import *
 from flask_sqlalchemy import *
 from database.db import db
 from model.usuarioModel import UsuarioModel
+from model.colecaoModel import ColecaoModel
+from model.progressoModel import ProgressoModel
 from controller.controllerUsuario import ControllerUsuario
 from controller.controllerLivro import ControllerLivro
 from controller.controllerCapitulo import ControllerCapitulo
+from controller.controllerColecao import ControllerColecao
 import os
 from werkzeug.utils import secure_filename
 import uuid
@@ -24,6 +27,7 @@ from flask_jwt_extended import (
 controllerUsuario=ControllerUsuario()
 controllerLivro=ControllerLivro()
 controllerCapitulo=ControllerCapitulo()
+controllerColecao=ControllerColecao()
 
 
 app=Flask(__name__)
@@ -61,11 +65,33 @@ def login_obrigatorio(view):
         try:
             verify_jwt_in_request()
         except Exception:
-            return redirect(url_for("login"))
+            return redirect(url_for("renderLogin"))
 
         return view(*args, **kwargs)
 
     return wrapper
+
+
+@app.context_processor
+def injetar_usuario():
+    usuario_atual = None
+    try:
+        verify_jwt_in_request(optional=True)
+        identidade = get_jwt_identity()
+        if identidade:
+            usuario_atual = controllerUsuario.getUserId(int(identidade))
+    except Exception:
+        usuario_atual = None
+
+    def url_capa(caminho):
+        if not caminho:
+            return ""
+        normalizado = caminho.replace("\\", "/")
+        if normalizado.startswith(("http://", "https://", "/")):
+            return normalizado
+        return "/" + normalizado
+
+    return dict(usuario_atual=usuario_atual, url_capa=url_capa)
 
 # LOGIN OBRIGATORIO TIPO DE USUARIO:
 def tipo_usuario_obrigatorio(tipo):
@@ -91,7 +117,16 @@ def tipo_usuario_obrigatorio(tipo):
 #os renders
 @app.route("/")
 def home():
-    return render_template('index.html')
+    livros = controllerLivro.getLivros()[:8]
+    favoritos_ids = set()
+    try:
+        verify_jwt_in_request(optional=True)
+        identidade = get_jwt_identity()
+        if identidade:
+            favoritos_ids = controllerColecao.getIdsColecao(int(identidade))
+    except Exception:
+        pass
+    return render_template('index.html', livros=livros, favoritos_ids=favoritos_ids)
 @app.route("/renderLogin")
 def renderLogin():
     return render_template("login.html")
@@ -186,16 +221,55 @@ def cadastrarLivro():
 @app.route("/biblioteca")
 @login_obrigatorio
 def biblioteca():
-    livros=controllerLivro.getLivros()
-    return render_template("biblioteca.html",livros=livros)
+    busca = request.args.get("q", "").strip()
+    livros = controllerLivro.getLivros()
+    if busca:
+        termo = busca.lower()
+        livros = [
+            l for l in livros
+            if termo in l.titulo.lower() or termo in l.autor.lower()
+        ]
+    idUsuario = int(get_jwt_identity())
+    favoritos_ids = controllerColecao.getIdsColecao(idUsuario)
+    return render_template("biblioteca.html", livros=livros, favoritos_ids=favoritos_ids, busca=busca)
+
+@app.route("/favoritos")
+@login_obrigatorio
+def favoritos():
+    idUsuario = int(get_jwt_identity())
+    livros = controllerColecao.getLivrosColecao(idUsuario)
+    favoritos_ids = {l.id for l in livros}
+    return render_template("favoritos.html", livros=livros, favoritos_ids=favoritos_ids)
+
+@app.route("/favoritar/<int:idLivro>", methods=["POST"])
+@app.route("/favoritar/livro/<int:idLivro>", methods=["GET", "POST"])
+@login_obrigatorio
+def favoritar(idLivro):
+    idUsuario = int(get_jwt_identity())
+    livro = controllerLivro.getLivroIdLivro(idLivro)
+    if not livro:
+        abort(404)
+
+    status = controllerColecao.favoritarLivro(idUsuario, idLivro)
+    if status is None:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+            return jsonify({"erro": "Erro ao atualizar favorito"}), 500
+        return redirect(request.referrer or url_for("biblioteca"))
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+        return jsonify({"favorito": status, "idLivro": idLivro})
+
+    return redirect(request.referrer or url_for("biblioteca"))
 
 @app.route("/lerLivro/<id>")
 @login_obrigatorio
 def lerLivro(id):
     idLivro=int(id)
+    idUsuario=int(get_jwt_identity())
     livro=controllerLivro.getLivroIdLivro(idLivro)
     capitulos=controllerCapitulo.getCapitulos(idLivro)
-    return render_template("lerLivro.html",capitulos=capitulos,livro=livro)
+    is_favorito=controllerColecao.isFavorito(idUsuario, idLivro)
+    return render_template("lerLivro.html",capitulos=capitulos,livro=livro,is_favorito=is_favorito)
 
 @app.route("/lerCapitulo/<int:idCapitulo>")
 @login_obrigatorio
@@ -311,6 +385,7 @@ def deleterLivroId(idLivro):
     if idSession != livro.idUsuario:
         abort(403)
 
+    controllerColecao.deletarColecaoLivro(livro.id)
     mensagem = controllerLivro.deletarLivro(livro)
     livros=controllerLivro.getLivrosAutor(idSession)
     if mensagem == False:
