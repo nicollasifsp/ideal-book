@@ -9,6 +9,15 @@ import os
 from werkzeug.utils import secure_filename
 import uuid
 from dotenv import *
+from datetime import timedelta
+from functools import wraps
+
+from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask_jwt_extended import (
+    JWTManager, create_access_token,
+    get_jwt_identity, verify_jwt_in_request,
+    set_access_cookies, unset_jwt_cookies
+)
 
 
 controllerUsuario=ControllerUsuario()
@@ -17,6 +26,16 @@ controllerCapitulo=ControllerCapitulo()
 
 
 app=Flask(__name__)
+
+app.config["JWT_SECRET_KEY"] = "troque-esta-chave-em-producao"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+
+# Permite que o JWT seja lido a partir de Cookies enviados pelo navegador
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+
+jwt = JWTManager(app)
+
 app.config["SQLALCHEMY_DATABASE_URI"]="sqlite:///idealBook.db"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
@@ -33,6 +52,20 @@ os.makedirs(IMG_FOLDER, exist_ok=True)
 os.makedirs(JS_FOLDER, exist_ok=True)
 os.makedirs(CSS_FOLDER, exist_ok=True)
 
+
+#LOGIN OBRIGATORIO:
+def login_obrigatorio(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        try:
+            verify_jwt_in_request()
+        except Exception:
+            return redirect(url_for("login"))
+
+        return view(*args, **kwargs)
+
+    return wrapper
+
 #os renders
 @app.route("/")
 def home():
@@ -48,6 +81,7 @@ def renderCadastro():
 @app.route("/cadastrarLivro")
 def renderCadastrarLivro():
     return render_template("cadastrarLivro.html")
+
 @app.route("/Login",methods=["POST"])
 def fazerLogin():
     email=request.form["email"]
@@ -56,11 +90,17 @@ def fazerLogin():
     if mensagemLogin==False:
         return render_template("login.html",erro="Usuário não encontrado, tente criar uma conta")
     else:
+        #gerar token
+        token=create_access_token(indentity=str(mensagemLogin.id))
         session["user_id"] = mensagemLogin.id
         if mensagemLogin.tipoUsuario == "leitor":
-            return redirect(url_for("biblioteca"))
+            resposta= redirect(url_for("biblioteca"))
         else:
-            return redirect(url_for("renderCadastrarLivro"))
+            resposta= redirect(url_for("renderCadastrarLivro"))
+        # adicionar JWT a resposta
+        set_access_cookies(resposta, token)
+        return resposta
+        
 
 @app.route('/Cadastro',methods=["POST"])
 def fazerCadastro():
@@ -80,7 +120,9 @@ def fazerCadastro():
         return render_template("cadastro.html",erro="Esse usuário já foi cadastrado")
     
 @app.route("/cadastrarLivro",methods=["POST"])
+
 def cadastrarLivro():
+
     titulo=request.form["titulo"]
     autor=request.form["autor"]
     descricao=request.form["descricao"]
@@ -178,7 +220,7 @@ def editarCapitulo(idCapitulo):
         if mensagem==True:
             return render_template("editarCapitulo.html",sucesso="Capítulo atualizado com sucesso",capitulo=capitulo)
         else:
-             return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
+            return render_template("editarCapitulo.html",erro="infelizmente ocorreu um erro tente mais tarde",capitulo=capitulo)
         
     
     def autoSave():
